@@ -1,4 +1,4 @@
-let mongoose = require('mongoose')
+let mongoose = require('mongoose');
 
 let friendListSchema = new mongoose.Schema({
     userId: Number,

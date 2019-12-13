@@ -1,18 +1,16 @@
 "use strict";
 
-let database = require('../../db');
 let models = require('../models/friendlist.model');
-
-var db = database.connection;
-
-var findFriends = async function() {
-    return await models.FriendList.find({});
-}
+var Promise = require('bluebird');
 
 class FriendListService {
-    static getFriends() {
-        var friends = findFriends();
-        return {friends: "list"};
+    static getFriends(userId) {
+        return new Promise((resolve, reject) => {
+            models.FriendList.findOne({userId: userId}, (err, friends) => {
+                if (!friends) resolve([]);
+                else resolve(friends.friends);
+            });
+        });
     }
 }
 

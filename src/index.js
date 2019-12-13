@@ -2,6 +2,7 @@ let express = require('express');
 
 let app = express();
 let friendListRoute = require('./routes/friendList');
+let requestRoute = require('./routes/request');
 let path = require('path');
 let bodyParser = require('body-parser');
 let mongoose = require('mongoose');
@@ -18,6 +19,7 @@ app.use((req, res, next) => {
 });
 
 app.use(friendListRoute);
+app.use(requestRoute);
 
 app.use(express.static('public'));
 

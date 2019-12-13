@@ -1,11 +1,12 @@
 const FriendListService = require("../services/friendListService.js");
 let express = require('express');
 let router = express.Router();
+let models = require('../models/friendlist.model');
 
-// Gets anime list
-// GET localhost:3000/customer
 router.get('/users/:id/friends', (req, res) => {
-    res.send(FriendListService.getFriends());
+    FriendListService.getFriends(req.params.id).then(data => {
+        res.send(data);
+    });
 });
 
 module.exports = router;
