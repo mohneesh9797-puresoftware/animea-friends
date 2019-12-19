@@ -12,7 +12,7 @@ class RequestService {
             });
         });
     }
-
+    /*
     static createRequest(req) {
         return new Promise((resolve, reject) => {
             models.RequestM.findOne({userId: req.userId, friendId: req.friendId}, (err, res) => {
@@ -61,6 +61,33 @@ class RequestService {
             });
         });
     }
+
+    //TODO
+    static deleteAllRequests(){
+        return new Promise((resolve,reject) =>{
+            models.deleteAllRequests({},()  => {
+                resolve(202)})
+        })
+    }
+
+    //TODO
+    static getFriendRequest(req){
+        
+    }
+
+    //TODO
+    static updateFriendRequest(reqId)
+
+    //TRY
+    static deleteFriendRequest(reqId){
+        return new Promise((resolve,reject) =>{
+            models.remove({
+                id: reqId
+            }, function(err, docs){
+                resolve(202);
+            });
+        });
+    } */
 }
 
 module.exports = RequestService;
