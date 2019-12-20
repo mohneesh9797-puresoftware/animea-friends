@@ -12,7 +12,7 @@ class RequestService {
             });
         });
     }
-    /*
+    
     static createRequest(req) {
         return new Promise((resolve, reject) => {
             models.RequestM.findOne({userId: req.userId, friendId: req.friendId}, (err, res) => {
@@ -62,32 +62,60 @@ class RequestService {
         });
     }
 
-    //TODO
-    static deleteAllRequests(){
+    //check
+    static deleteAllRequests(userId){
+        return new Promise((resolve,reject)=>{
+            models.RequestM.remove({userId: userId},(err)=>{
+                resolve(204);
+            });
+        });
+    }
+
+    //TODO falta el metodo de buscar el user
+    static getFriendRequest(userId,requestId){
         return new Promise((resolve,reject) =>{
-            models.deleteAllRequests({},()  => {
-                resolve(202)})
+            models.RequestM.findOne({id: requestId},(err,req) =>{
+                /*
+                if(noExisteElUser){  <- metodo de get ususario 
+                    reject(404);
+                }    
+                */
+                if(err){
+                    reject(404);
+                }
+                resolve(req);
+            });
+        }
+        )
+    }
+
+    //TODO
+    static updateFriendRequest(reqId){
+        return new Promise(function (resolve,reject){
+            models.RequestM.update({
+                'request_id': reqId 
+            }, reqId, function(){
+                resolve();
+            })
         })
     }
 
-    //TODO
-    static getFriendRequest(req){
-        
-    }
-
-    //TODO
-    static updateFriendRequest(reqId)
-
     //TRY
-    static deleteFriendRequest(reqId){
+    static deleteFriendRequest(userId,reqId){
         return new Promise((resolve,reject) =>{
-            models.remove({
-                id: reqId
-            }, function(err, docs){
-                resolve(202);
+            models.RequestM.findOne({userId: userId}, (err,requests) => {
+                if(!requests || !requests.requests.includes(reqId)) resolve(404);
+                else {
+                    var reqIndex = requests.requests.indexOf(reqId);
+                    var reqCopy = requests.requests;
+                    reqCopy.splice(reqIndex, 1);
+                    models.RequestM.updateOne({userId:userId},{requests: reqCopy}, (err)=> {
+                        resolve(204);
+                    });
+                }
             });
         });
-    } */
+    } 
 }
 
 module.exports = RequestService;
