@@ -35,8 +35,8 @@ describe("Friend list resource", () => {
             callback(null, friendList);
         });
 
-        dbRemove = jest.spyOn(models.FriendList, "remove");
-        dbRemove.mockImplementation((query, callback) => {
+        dbDeleteOne = jest.spyOn(models.FriendList, "deleteOne");
+        dbDeleteOne.mockImplementation((query, callback) => {
             callback(null);
         });
 
