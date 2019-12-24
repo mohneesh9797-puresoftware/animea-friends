@@ -32,7 +32,7 @@ router.delete('/users/:id/requests', (req,res)=>{
 
 //Get one specific request
 router.get('/users/:id/requests/:reqId', (req, res) => {
-    RequestService.getFriendRequest(req.params.id, req.params.reqId).then(data => {
+    RequestService.getFriendRequest(req.params.reqId).then(data => {
         res.sendStatus(data);
     });
 });

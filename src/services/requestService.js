@@ -8,7 +8,8 @@ class RequestService {
     static getRequests(userId) {
         return new Promise((resolve, reject) => {
             models.RequestM.find({userId: userId}, (err, requests) => {
-                resolve(requests);
+                if (err) resolve(404);
+                else resolve(requests);
             });
         });
     }
@@ -57,6 +58,27 @@ class RequestService {
                             });
                         }
                     });
+                    //buscar el amigo y actualizarle la lista de amigos al aceptar la request
+                    friendModels.FriendList.findOne({userId: req.friendId}, (err, friends) => {
+                        if (!friends) {
+                            friendModels.FriendList.create({
+                                userId: req.friendId,
+                                friends: [req.userId]
+                            }, (err) => {
+                                models.RequestM.deleteOne({id: reqId}, (err) => {
+                                    resolve(204);
+                                });
+                            });
+                        } else {
+                            friends.friends.push(req.userId);
+                            friendModels.FriendList.updateOne({userId: req.friendId}, {friends: friends.friends}, (err) => {
+                                models.RequestM.deleteOne({id: reqId}, (err) => {
+                                    resolve(204);
+                                });
+                            });
+                        }
+                    });
+
                 } else resolve(404)
             });
         });
@@ -66,30 +88,26 @@ class RequestService {
     static deleteAllRequests(userId){
         return new Promise((resolve,reject)=>{
             models.RequestM.remove({userId: userId},(err)=>{
-                resolve(204);
+                if(err) resolve(404)
+                else resolve(204);
             });
         });
     }
 
-    //TODO falta el metodo de buscar el user
+    //TODO 
     static getFriendRequest(userId,requestId){
         return new Promise((resolve,reject) =>{
-            models.RequestM.findOne({id: requestId},(err,req) =>{
-                /*
-                if(noExisteElUser){  <- metodo de get ususario 
-                    reject(404);
-                }    
-                */
-                if(err){
-                    reject(404);
+            models.RequestM.findOne({userId: userId, reqId: requestId},(err,request) =>{
+                if(err) resolve(404)
+                else{
+                    if (!request) resolve(404)
+                    else resolve(request)
                 }
-                resolve(req);
             });
-        }
-        )
+        })
     }
 
-    //TODO
+    //TRY
     static updateFriendRequest(reqId){
         return new Promise(function (resolve,reject){
             models.RequestM.update({
@@ -100,18 +118,16 @@ class RequestService {
         })
     }
 
-    //TRY
+    //TRY  
     static deleteFriendRequest(userId,reqId){
         return new Promise((resolve,reject) =>{
-            models.RequestM.findOne({userId: userId}, (err,requests) => {
-                if(!requests || !requests.requests.includes(reqId)) resolve(404);
+            models.RequestM.findOne({userId: userId}, (err,request) => {
+                if(!request || err) resolve(404);
                 else {
-                    var reqIndex = requests.requests.indexOf(reqId);
-                    var reqCopy = requests.requests;
-                    reqCopy.splice(reqIndex, 1);
-                    models.RequestM.updateOne({userId:userId},{requests: reqCopy}, (err)=> {
-                        resolve(204);
-                    });
+                    models.RequestM.remove({reqId: reqId},(err)=>{
+                        if(err) resolve(404)
+                        else resolve(204)
+                    })
                 }
             });
         });
