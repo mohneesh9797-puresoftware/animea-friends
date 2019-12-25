@@ -84,10 +84,10 @@ class RequestService {
         });
     }
 
-    //check
+    //No me devuelve ni 200 ni 400. No hace nada
     static deleteAllRequests(userId){
         return new Promise((resolve,reject)=>{
-            models.RequestM.remove({userId: userId},(err)=>{
+            models.RequestM.deleteMany({userId: userId},(err)=>{
                 if(err) resolve(404)
                 else resolve(204);
             });
@@ -113,7 +113,7 @@ class RequestService {
             models.RequestM.update({
                 'request_id': reqId 
             }, reqId, function(){
-                resolve();
+                resolve(204);
             })
         })
     }
@@ -124,7 +124,7 @@ class RequestService {
             models.RequestM.findOne({userId: userId}, (err,request) => {
                 if(!request || err) resolve(404);
                 else {
-                    models.RequestM.remove({reqId: reqId},(err)=>{
+                    models.RequestM.deleteOne({reqId: reqId},(err)=>{
                         if(err) resolve(404)
                         else resolve(204)
                     })
