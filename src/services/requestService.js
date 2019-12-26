@@ -84,7 +84,7 @@ class RequestService {
         });
     }
 
-    //No me devuelve ni 200 ni 400. No hace nada
+    //Funciona
     static deleteAllRequests(userId){
         return new Promise((resolve,reject)=>{
             models.RequestM.deleteMany({userId: userId},(err)=>{
@@ -94,10 +94,10 @@ class RequestService {
         });
     }
 
-    //TODO 
-    static getFriendRequest(userId,requestId){
+    //TODO FALLA. UNDEFINED STATUS
+    static getFriendRequest(friendId){
         return new Promise((resolve,reject) =>{
-            models.RequestM.findOne({userId: userId, reqId: requestId},(err,request) =>{
+            models.RequestM.findOne({friendId: friendId},(err,request) =>{
                 if(err) resolve(404)
                 else{
                     if (!request) resolve(404)
@@ -118,17 +118,12 @@ class RequestService {
         })
     }
 
-    //TRY  
-    static deleteFriendRequest(userId,reqId){
+    //Funciona
+    static deleteFriendRequest(reqId){
         return new Promise((resolve,reject) =>{
-            models.RequestM.findOne({userId: userId}, (err,request) => {
-                if(!request || err) resolve(404);
-                else {
-                    models.RequestM.deleteOne({reqId: reqId},(err)=>{
-                        if(err) resolve(404)
-                        else resolve(204)
-                    })
-                }
+            models.RequestM.deleteOne({id: reqId}, (err) => {
+                if (err) resolve(404);
+                else resolve(204);    
             });
         });
     } 

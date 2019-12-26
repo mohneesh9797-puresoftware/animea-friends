@@ -25,7 +25,7 @@ router.get('/users/:id/requests/:reqId/accept', (req, res) => {
 
 //Delete All the requests
 router.delete('/users/:id/requests', (req,res)=>{
-    RequestService.deleteAllRequests(req.params.reqId).then(data => {
+    RequestService.deleteAllRequests(req.params.id).then(data => {
         res.sendStatus(data);
     });
 });
@@ -46,7 +46,7 @@ router.put('/users/:id/requests/:reqId',(req,res) =>{
 
 //Delete a friend request
 router.delete('/users/:id/requests/:reqId',(req,res)=>{
-    RequestService.deleteFriendRequest(req.params.id,req.params.reqId).then(data =>{
+    RequestService.deleteFriendRequest(req.params.id).then(data =>{
         res.sendStatus(data);
     });
 });
