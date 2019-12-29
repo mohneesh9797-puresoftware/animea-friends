@@ -8,11 +8,12 @@ class RequestService {
     static getRequests(userId) {
         return new Promise((resolve, reject) => {
             models.RequestM.find({userId: userId}, (err, requests) => {
-                resolve(requests);
+                if (err) resolve(404);
+                else resolve(requests);
             });
         });
     }
-
+    
     static createRequest(req) {
         return new Promise((resolve, reject) => {
             models.RequestM.findOne({userId: req.userId, friendId: req.friendId}, (err, res) => {
@@ -57,10 +58,90 @@ class RequestService {
                             });
                         }
                     });
+                    //buscar el amigo y actualizarle la lista de amigos al aceptar la request
+                    friendModels.FriendList.findOne({userId: req.friendId}, (err, friends) => {
+                        if (!friends) {
+                            friendModels.FriendList.create({
+                                userId: req.friendId,
+                                friends: [req.userId]
+                            }, (err) => {
+                                models.RequestM.deleteOne({id: reqId}, (err) => {
+                                    resolve(204);
+                                });
+                            });
+                        } else {
+                            friends.friends.push(req.userId);
+                            friendModels.FriendList.updateOne({userId: req.friendId}, {friends: friends.friends}, (err) => {
+                                models.RequestM.deleteOne({id: reqId}, (err) => {
+                                    resolve(204);
+                                });
+                            });
+                        }
+                    });
+
                 } else resolve(404)
             });
         });
     }
+
+    //Funciona
+    static deleteAllRequests(userId){
+        return new Promise((resolve,reject)=>{
+            models.RequestM.deleteMany({userId: userId},(err)=>{
+                if(err) resolve(404)
+                else resolve(204);
+            });
+        });
+    }
+
+    //Funciona
+    static getFriendRequest(reqId){
+        return new Promise((resolve,reject) =>{
+            models.RequestM.findOne({id: reqId},(err,request) =>{
+                if(err) reject(404);
+                else{
+                    if (!request) reject(404);
+                    else resolve(request);
+                }
+            });
+        });
+    }
+
+    //TRY
+    static updateFriendRequest(reqId, req){
+        return new Promise(function (resolve,reject){
+            models.RequestM.findOne({id: reqId},(err,request) =>{
+                if(err) resolve(404);
+                else{
+                    if (!request) resolve(404);
+                    else {
+                        models.RequestM.updateOne({id: reqId}, req, (err) => {
+                            if (err) resolve(404);
+                            else resolve(204);
+                        });
+                    }
+                }
+            });
+        });
+    }
+
+    //Funciona
+    static deleteFriendRequest(reqId){
+        return new Promise((resolve,reject) =>{
+            models.RequestM.findOne({id: reqId},(err,request) =>{
+                if(err) resolve(404);
+                else{
+                    if (!request) resolve(404);
+                    else {
+                        models.RequestM.deleteOne({id: reqId}, (err) => {
+                            if (err) resolve(404);
+                            else resolve(204);
+                        });
+                    }
+                }
+            });
+        });
+    } 
 }
 
 module.exports = RequestService;
