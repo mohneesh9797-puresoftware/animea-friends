@@ -33,20 +33,22 @@ router.delete('/users/:id/requests', (req,res)=>{
 //Get one specific request
 router.get('/users/:id/requests/:reqId', (req, res) => {
     RequestService.getFriendRequest(req.params.reqId).then(data => {
-        res.sendStatus(data);
+        res.send(data);
+    }).catch(err => {
+        res.sendStatus(err);
     });
 });
 
 //update a request
 router.put('/users/:id/requests/:reqId',(req,res) =>{
-    RequestService.updateFriendRequest(req.params.id).then(data =>{
+    RequestService.updateFriendRequest(req.params.reqId, req.body).then(data =>{
         res.sendStatus(data);
     });
 });
 
 //Delete a friend request
 router.delete('/users/:id/requests/:reqId',(req,res)=>{
-    RequestService.deleteFriendRequest(req.params.id).then(data =>{
+    RequestService.deleteFriendRequest(req.params.reqId).then(data =>{
         res.sendStatus(data);
     });
 });

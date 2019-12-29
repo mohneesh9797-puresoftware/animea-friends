@@ -94,36 +94,51 @@ class RequestService {
         });
     }
 
-    //TODO FALLA. UNDEFINED STATUS
-    static getFriendRequest(friendId){
+    //Funciona
+    static getFriendRequest(reqId){
         return new Promise((resolve,reject) =>{
-            models.RequestM.findOne({friendId: friendId},(err,request) =>{
-                if(err) resolve(404)
+            models.RequestM.findOne({id: reqId},(err,request) =>{
+                if(err) reject(404);
                 else{
-                    if (!request) resolve(404)
-                    else resolve(request)
+                    if (!request) reject(404);
+                    else resolve(request);
                 }
             });
-        })
+        });
     }
 
     //TRY
-    static updateFriendRequest(reqId){
+    static updateFriendRequest(reqId, req){
         return new Promise(function (resolve,reject){
-            models.RequestM.update({
-                'request_id': reqId 
-            }, reqId, function(){
-                resolve(204);
-            })
-        })
+            models.RequestM.findOne({id: reqId},(err,request) =>{
+                if(err) resolve(404);
+                else{
+                    if (!request) resolve(404);
+                    else {
+                        models.RequestM.updateOne({id: reqId}, req, (err) => {
+                            if (err) resolve(404);
+                            else resolve(204);
+                        });
+                    }
+                }
+            });
+        });
     }
 
     //Funciona
     static deleteFriendRequest(reqId){
         return new Promise((resolve,reject) =>{
-            models.RequestM.deleteOne({id: reqId}, (err) => {
-                if (err) resolve(404);
-                else resolve(204);    
+            models.RequestM.findOne({id: reqId},(err,request) =>{
+                if(err) resolve(404);
+                else{
+                    if (!request) resolve(404);
+                    else {
+                        models.RequestM.deleteOne({id: reqId}, (err) => {
+                            if (err) resolve(404);
+                            else resolve(204);
+                        });
+                    }
+                }
             });
         });
     } 
