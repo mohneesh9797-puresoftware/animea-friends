@@ -1,6 +1,7 @@
 let express = require('express');
 
 let app = express();
+let cors = require('cors');
 let friendListRoute = require('./routes/friendList');
 let requestRoute = require('./routes/request');
 let path = require('path');
@@ -11,6 +12,7 @@ let database = require('../db');
 database.connect();
 
 app.use(bodyParser.json());
+app.use(cors());
 
 // Middleware to show logs of every call
 app.use((req, res, next) => {
@@ -35,7 +37,7 @@ app.use((err, req, res, next) => {
     res.sendFile(path.join(__dirname, '../public/500.html'));
 });
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3003;
 
 app.listen(PORT, () => console.info(`Server has started on port ${PORT}`));
 
