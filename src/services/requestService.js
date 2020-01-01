@@ -7,30 +7,42 @@ var Promise = require('bluebird');
 class RequestService {
     static getRequests(userId) {
         return new Promise((resolve, reject) => {
-            models.RequestM.find({userId: userId}, (err, requests) => {
-                if (err) resolve(404);
-                else resolve(requests);
-            });
+            rp('http://localhost:3002/api/profile/' + userId).then(() => {
+                models.RequestM.find({userId: userId}, (err, requests) => {
+                    if (err) reject(404);
+                    else resolve(requests);
+                });
+            }).catch(() => {
+                reject(404);
+            })
         });
     }
     
     static createRequest(req) {
         return new Promise((resolve, reject) => {
-            models.RequestM.findOne({userId: req.userId, friendId: req.friendId}, (err, res) => {
-                if (res) resolve(400);
-                else {
-                    friendModels.FriendList.findOne({userId: req.userId}, (err, friends) => {
-                        if (!friends || !friends.friends.includes(req.friendId)) {
-                            req.id = Math.round(Math.random() * 1000);
-                            models.RequestM.create(req, (err) => {
-                                console.log(req);
-                                resolve(201);
+            rp('http://localhost:3002/api/profile/' + req.userId).then(() => {
+                rp('http://localhost:3002/api/profile/' + req.friendId).then(() => {
+                    models.RequestM.findOne({userId: req.userId, friendId: req.friendId}, (err, res) => {
+                        if (res) resolve(400);
+                        else {
+                            friendModels.FriendList.findOne({userId: req.userId}, (err, friends) => {
+                                if (!friends || !friends.friends.includes(req.friendId)) {
+                                    req.id = Math.round(Math.random() * 1000);
+                                    models.RequestM.create(req, (err) => {
+                                        console.log(req);
+                                        resolve(201);
+                                    });
+                                } else {
+                                    resolve(400);
+                                }
                             });
-                        } else {
-                            resolve(400);
                         }
                     });
-                }
+                }).catch(() => {
+                    resolve(404);
+                });
+            }).catch(() => {
+                resolve(404);
             });
         });
     }
@@ -87,10 +99,14 @@ class RequestService {
     //Funciona
     static deleteAllRequests(userId){
         return new Promise((resolve,reject)=>{
-            models.RequestM.deleteMany({userId: userId},(err)=>{
-                if(err) resolve(404)
-                else resolve(204);
-            });
+            rp('http://localhost:3002/api/profile/' + userId).then(() => {
+                models.RequestM.deleteMany({userId: userId},(err)=>{
+                    if(err) resolve(404)
+                    else resolve(204);
+                });
+            }).catch(() => {
+                resolve(404);
+            })
         });
     }
 
