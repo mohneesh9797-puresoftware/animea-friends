@@ -3,8 +3,15 @@ let express = require('express');
 let router = express.Router();
 
 //Get the requests from an user
-router.get('/users/:id/requests', (req, res) => {
-    RequestService.getRequests(req.params.id).then(data => {
+router.get('/users/:id/requests/true', (req, res) => {
+    RequestService.getRequests(req.params.id,true).then(data => {
+        res.send(data);
+    });
+});
+
+//Get the requests an user has done
+router.get('/users/:id/requests/false', (req, res) => {
+    RequestService.getRequests(req.params.id,false).then(data => {
         res.send(data);
     });
 });

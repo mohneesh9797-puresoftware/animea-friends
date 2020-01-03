@@ -4,13 +4,24 @@ let models = require('../models/request.model');
 let friendModels = require('../models/friendlist.model');
 var Promise = require('bluebird');
 
+var prueba = new Boolean(); //True = req made to him/her
+                            //False = req he/she made
 class RequestService {
-    static getRequests(userId) {
+    static getRequests(userId,prueba) {
         return new Promise((resolve, reject) => {
+        if(prueba){
             models.RequestM.find({userId: userId}, (err, requests) => {
                 if (err) resolve(404);
                 else resolve(requests);
+            });}
+        else{
+            models.RequestM.find({friendId: userId}, (err, requests) => {
+                if (err) resolve(404);
+                else resolve(requests);
             });
+        }
+            
+
         });
     }
     
