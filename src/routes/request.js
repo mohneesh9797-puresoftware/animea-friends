@@ -4,7 +4,7 @@ let router = express.Router();
 
 //Get the requests from an user
 router.get('/users/:id/requests', (req, res) => {
-    RequestService.getRequests(req.params.id).then(data => {
+    RequestService.getRequests(req.params.id,req.query.received).then(data => {
         res.send(data);
     });
 });
