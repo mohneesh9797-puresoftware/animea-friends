@@ -7,14 +7,14 @@ var Promise = require('bluebird');
 var prueba = new Boolean(); //True = req made to him/her
                             //False = req he/she made
 class RequestService {
-    static getRequests(userId,prueba) {
+    static getRequests(userId,received) {
         return new Promise((resolve, reject) => {
-        if(prueba){
+        if(received){
             models.RequestM.find({userId: userId}, (err, requests) => {
                 if (err) resolve(404);
                 else resolve(requests);
-            });}
-        else{
+            });
+        }else{
             models.RequestM.find({friendId: userId}, (err, requests) => {
                 if (err) resolve(404);
                 else resolve(requests);
