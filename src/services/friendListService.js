@@ -16,7 +16,7 @@ class FriendListService {
                         friends.friends.forEach(friend => {
                             promises.push(new Promise((resolve, reject) => {
                                 rp('http://localhost:3002/api/profile/' + friend).then((retFr) => {
-                                    retFriends.push(retFr);
+                                    retFriends.push(JSON.parse(retFr));
                                     resolve();
                                 });
                             }));

@@ -3,6 +3,7 @@
 let models = require('../models/request.model');
 let friendModels = require('../models/friendlist.model');
 var Promise = require('bluebird');
+var rp = require('request-promise');
 
 class RequestService {
     static getRequests(userId) {
