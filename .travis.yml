@@ -1,0 +1,24 @@
+language: node_js
+node_js:
+  - 'stable'
+before_install:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+install: npm install
+jobs:
+  include:
+    # - stage: run tests
+    #   arch: amd64
+    #   script:
+    #   - npm test
+    - stage: build docker image
+      if: branch = feature/CI
+      arch: arm64
+      script:
+      - docker build -t animea-friends .
+      - docker tag animea-friends animea/animea-friends:latest
+      - docker push animea/animea-friends:latest
+    - stage: update services in server
+      if: branch = feature/CI
+      arch: amd64
+      script:
+      - curl http://$SERVER_IP:$API_PORT/update
