@@ -6,6 +6,8 @@ let router = express.Router();
 router.get('/users/:id/requests', (req, res) => {
     RequestService.getRequests(req.params.id,req.query.received).then(data => {
         res.send(data);
+    }).catch(err => {
+        res.sendStatus(err);
     });
 });
 

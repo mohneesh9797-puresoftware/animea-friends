@@ -2,8 +2,8 @@ let mongoose = require('mongoose');
 
 let requestSchema = new mongoose.Schema({
     id: Number,
-    userId: Number,
-    friendId: Number,
+    userId: mongoose.Schema.Types.ObjectId,
+    friendId: mongoose.Schema.Types.ObjectId,
     message: String
 });
 

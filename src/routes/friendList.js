@@ -5,6 +5,8 @@ let router = express.Router();
 router.get('/users/:id/friends', (req, res) => {
     FriendListService.getFriends(req.params.id).then(data => {
         res.send(data);
+    }).catch(err => {
+        res.sendStatus(err);
     });
 });
 
