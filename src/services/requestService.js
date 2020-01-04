@@ -5,27 +5,24 @@ let friendModels = require('../models/friendlist.model');
 var Promise = require('bluebird');
 var rp = require('request-promise');
 
-var prueba = new Boolean(); //True = req made to him/her
-                            //False = req he/she made
 class RequestService {
     static getRequests(userId,received) {
         return new Promise((resolve, reject) => {
-                    if (err) reject(404);
             rp('http://localhost:3002/api/profile/' + userId).then(() => {
                 if(received){
-            models.RequestM.find({userId: userId}, (err, requests) => {
-                if (err) resolve(404);
-                else resolve(requests);
-            });
-        }else{
-            models.RequestM.find({friendId: userId}, (err, requests) => {
-                if (err) resolve(404);
-                else resolve(requests);
-            });
-        }
+                    models.RequestM.find({userId: userId}, (err, requests) => {
+                        if (err) reject(404);
+                        else resolve(requests);
+                    });
+                }else{
+                    models.RequestM.find({friendId: userId}, (err, requests) => {
+                        if (err) reject(404);
+                        else resolve(requests);
+                    });
+                }
             }).catch(() => {
                 reject(404);
-            })
+            });
         });
     }
     
@@ -40,8 +37,8 @@ class RequestService {
                                 if (!friends || !friends.friends.includes(req.friendId)) {
                                     req.id = Math.round(Math.random() * 1000);
                                     models.RequestM.create(req, (err) => {
-                                        console.log(req);
-                                        resolve(201);
+                                        if (!err) resolve(201);
+                                        else resolve(500);
                                     });
                                 } else {
                                     resolve(400);
