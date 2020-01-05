@@ -8,20 +8,63 @@ var rp = require('request-promise');
 class RequestService {
     static getRequests(userId,received) {
         return new Promise((resolve, reject) => {
-            rp('http://localhost:3002/api/profile/' + userId).then(() => {
-                if(received){
+            rp('http://localhost:3002/api/profile/' + userId).then((user) => {
+                if(!received){
                     models.RequestM.find({userId: userId}, (err, requests) => {
                         if (err) reject(404);
-                        else resolve(requests);
+                        else {
+                            var promises = [];
+                            var retReqs = [];
+                            requests.forEach(req => {
+                                promises.push(new Promise((resolve, reject) => {
+                                    this.getRequestData(req).then(retReq => {
+                                        retReqs.push(retReq);
+                                        resolve();
+                                    });
+                                }));
+                            });
+                            Promise.all(promises).then(() => {
+                                resolve(retReqs);
+                            });
+                        }
                     });
                 }else{
                     models.RequestM.find({friendId: userId}, (err, requests) => {
                         if (err) reject(404);
-                        else resolve(requests);
+                        else {
+                            var promises = [];
+                            var retReqs = [];
+                            requests.forEach(req => {
+                                promises.push(new Promise((resolve, reject) => {
+                                    this.getRequestData(req).then(retReq => {
+                                        retReqs.push(retReq);
+                                        resolve();
+                                    });
+                                }));
+                            });
+                            Promise.all(promises).then(() => {
+                                resolve(retReqs);
+                            });
+                        }
                     });
                 }
             }).catch(() => {
                 reject(404);
+            });
+        });
+    }
+
+    static getRequestData(request) {
+        return new Promise((resolve, reject) => {
+            rp('http://localhost:3002/api/profile/' + request.userId).then((user) => {
+                rp('http://localhost:3002/api/profile/' + request.friendId).then((friend) => {
+                    resolve({
+                        id: request.id,
+                        user: JSON.parse(user),
+                        friend: JSON.parse(friend),
+                        message: request.message
+                    });
+                });
             });
         });
     }
@@ -125,7 +168,11 @@ class RequestService {
                 if(err) reject(404);
                 else{
                     if (!request) reject(404);
-                    else resolve(request);
+                    else {
+                        this.getRequestData(request).then(req => {
+                            resolve(req);
+                        });
+                    }
                 }
             });
         });
