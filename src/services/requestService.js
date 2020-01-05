@@ -8,16 +8,48 @@ var rp = require('request-promise');
 class RequestService {
     static getRequests(userId,received) {
         return new Promise((resolve, reject) => {
-            rp('http://localhost:3002/api/profile/' + userId).then(() => {
-                if(received){
+            rp({
+                url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
+                insecure: true,
+                rejectUnauthorized: false
+            }).then((user) => {
+                if(!received){
                     models.RequestM.find({userId: userId}, (err, requests) => {
                         if (err) reject(404);
-                        else resolve(requests);
+                        else {
+                            var promises = [];
+                            var retReqs = [];
+                            requests.forEach(req => {
+                                promises.push(new Promise((resolve, reject) => {
+                                    this.getRequestData(req).then(retReq => {
+                                        retReqs.push(retReq);
+                                        resolve();
+                                    });
+                                }));
+                            });
+                            Promise.all(promises).then(() => {
+                                resolve(retReqs);
+                            });
+                        }
                     });
                 }else{
                     models.RequestM.find({friendId: userId}, (err, requests) => {
                         if (err) reject(404);
-                        else resolve(requests);
+                        else {
+                            var promises = [];
+                            var retReqs = [];
+                            requests.forEach(req => {
+                                promises.push(new Promise((resolve, reject) => {
+                                    this.getRequestData(req).then(retReq => {
+                                        retReqs.push(retReq);
+                                        resolve();
+                                    });
+                                }));
+                            });
+                            Promise.all(promises).then(() => {
+                                resolve(retReqs);
+                            });
+                        }
                     });
                 }
             }).catch(() => {
@@ -25,11 +57,42 @@ class RequestService {
             });
         });
     }
+
+    static getRequestData(request) {
+        return new Promise((resolve, reject) => {
+            rp({
+                url: 'https://185.176.5.147:7400/profile/api/profile/' + request.userId,
+                insecure: true,
+                rejectUnauthorized: false
+            }).then((user) => {
+                rp({
+                    url: 'https://185.176.5.147:7400/profile/api/profile/' + request.friendId,
+                    insecure: true,
+                    rejectUnauthorized: false
+                }).then((friend) => {
+                    resolve({
+                        id: request.id,
+                        user: JSON.parse(user),
+                        friend: JSON.parse(friend),
+                        message: request.message
+                    });
+                });
+            });
+        });
+    }
     
     static createRequest(req) {
         return new Promise((resolve, reject) => {
-            rp('http://localhost:3002/api/profile/' + req.userId).then(() => {
-                rp('http://localhost:3002/api/profile/' + req.friendId).then(() => {
+            rp({
+                url: 'https://185.176.5.147:7400/profile/api/profile/' + req.userId,
+                insecure: true,
+                rejectUnauthorized: false
+            }).then(() => {
+                rp({
+                    url: 'https://185.176.5.147:7400/profile/api/profile/' + req.friendId,
+                    insecure: true,
+                    rejectUnauthorized: false
+                }).then(() => {
                     models.RequestM.findOne({userId: req.userId, friendId: req.friendId}, (err, res) => {
                         if (res) resolve(400);
                         else {
@@ -107,7 +170,11 @@ class RequestService {
     //Funciona
     static deleteAllRequests(userId){
         return new Promise((resolve,reject)=>{
-            rp('http://localhost:3002/api/profile/' + userId).then(() => {
+            rp({
+                url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
+                insecure: true,
+                rejectUnauthorized: false
+            }).then(() => {
                 models.RequestM.deleteMany({userId: userId},(err)=>{
                     if(err) resolve(404)
                     else resolve(204);
@@ -125,7 +192,11 @@ class RequestService {
                 if(err) reject(404);
                 else{
                     if (!request) reject(404);
-                    else resolve(request);
+                    else {
+                        this.getRequestData(request).then(req => {
+                            resolve(req);
+                        });
+                    }
                 }
             });
         });
