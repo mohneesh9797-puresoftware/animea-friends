@@ -7,7 +7,11 @@ var rp = require('request-promise');
 class FriendListService {
     static getFriends(userId) {
         return new Promise((resolve, reject) => {
-            rp('http://localhost:3002/api/profile/' + userId).then(() => {
+            rp({
+                url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
+                insecure: true,
+                rejectUnauthorized: false
+            }).then(() => {
                 models.FriendList.findOne({userId: userId}, (err, friends) => {
                     if (!friends) resolve([]);
                     else {
@@ -15,7 +19,11 @@ class FriendListService {
                         var promises = [];
                         friends.friends.forEach(friend => {
                             promises.push(new Promise((resolve, reject) => {
-                                rp('http://localhost:3002/api/profile/' + friend).then((retFr) => {
+                                rp({
+                                    url: 'https://185.176.5.147:7400/profile/api/profile/' + friend,
+                                    insecure: true,
+                                    rejectUnauthorized: false
+                                }).then((retFr) => {
                                     retFriends.push(JSON.parse(retFr));
                                     resolve();
                                 });
@@ -34,7 +42,11 @@ class FriendListService {
 
     static removeFriends(userId) {
         return new Promise((resolve, reject) => {
-            rp('http://localhost:3002/api/profile/' + userId).then(() => {
+            rp({
+                url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
+                insecure: true,
+                rejectUnauthorized: false
+            }).then(() => {
                 models.FriendList.findOne({userId: userId}, (err, friends) => {
                     if (!friends) resolve(204);
                     else {
@@ -57,8 +69,16 @@ class FriendListService {
 
     static removeFriend(userId, friendId) {
         return new Promise((resolve, reject) => {
-            rp('http://localhost:3002/api/profile/' + userId).then(() => {
-                rp('http://localhost:3002/api/profile/' + friendId).then(() => {
+            rp({
+                url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
+                insecure: true,
+                rejectUnauthorized: false
+            }).then(() => {
+                rp({
+                    url: 'https://185.176.5.147:7400/profile/api/profile/' + friendId,
+                    insecure: true,
+                    rejectUnauthorized: false
+                }).then(() => {
                     models.FriendList.findOne({userId: userId}, (err, friends) => {
                         if (!friends || !friends.friends.includes(friendId)) resolve(404);
                         else  {
