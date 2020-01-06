@@ -5,7 +5,7 @@ let router = express.Router();
 var basePath = '/api/v1';
 
 router.get(basePath + '/users/:id/friends', (req, res) => {
-    FriendListService.getFriends(req.params.id).then(data => {
+    FriendListService.getFriends(req.params.id, req.userId).then(data => {
         res.send(data);
     }).catch(err => {
         res.sendStatus(err);
@@ -13,13 +13,13 @@ router.get(basePath + '/users/:id/friends', (req, res) => {
 });
 
 router.delete(basePath + '/users/:id/friends', (req, res) => {
-    FriendListService.removeFriends(req.params.id).then(data => {
+    FriendListService.removeFriends(req.params.id, req.userId).then(data => {
         res.sendStatus(data);
     });
 });
 
 router.delete(basePath + '/users/:id/friends/:friendId', (req, res) => {
-    FriendListService.removeFriend(req.params.id, req.params.friendId).then(data => {
+    FriendListService.removeFriend(req.params.id, req.params.friendId, req.userId).then(data => {
         res.sendStatus(data);
     });
 });

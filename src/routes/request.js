@@ -6,7 +6,7 @@ var basePath = '/api/v1';
 
 //Get the requests from an user
 router.get(basePath + '/users/:id/requests', (req, res) => {
-    RequestService.getRequests(req.params.id,req.query.received).then(data => {
+    RequestService.getRequests(req.params.id,req.query.received, req.userId).then(data => {
         res.send(data);
     }).catch(err => {
         res.sendStatus(err);
@@ -15,28 +15,28 @@ router.get(basePath + '/users/:id/requests', (req, res) => {
 
 //Create a request
 router.post(basePath + '/users/:id/requests', (req, res) => {
-    RequestService.createRequest(req.body).then(data => {
+    RequestService.createRequest(req.body, req.userId).then(data => {
         res.sendStatus(data);
     });
 });
 
 //Accept a request
 router.get(basePath + '/users/:id/requests/:reqId/accept', (req, res) => {
-    RequestService.acceptRequest(req.params.reqId).then(data => {
+    RequestService.acceptRequest(req.params.reqId, req.userId).then(data => {
         res.sendStatus(data);
     });
 });
 
 //Delete All the requests
 router.delete(basePath + '/users/:id/requests', (req,res)=>{
-    RequestService.deleteAllRequests(req.params.id).then(data => {
+    RequestService.deleteAllRequests(req.params.id, req.userId).then(data => {
         res.sendStatus(data);
     });
 });
 
 //Get one specific request
 router.get(basePath + '/users/:id/requests/:reqId', (req, res) => {
-    RequestService.getFriendRequest(req.params.reqId).then(data => {
+    RequestService.getFriendRequest(req.params.reqId, req.userId).then(data => {
         res.send(data);
     }).catch(err => {
         res.sendStatus(err);
@@ -45,14 +45,14 @@ router.get(basePath + '/users/:id/requests/:reqId', (req, res) => {
 
 //update a request
 router.put(basePath + '/users/:id/requests/:reqId',(req,res) =>{
-    RequestService.updateFriendRequest(req.params.reqId, req.body).then(data =>{
+    RequestService.updateFriendRequest(req.params.reqId, req.body, req.userId).then(data =>{
         res.sendStatus(data);
     });
 });
 
 //Delete a friend request
 router.delete(basePath + '/users/:id/requests/:reqId',(req,res)=>{
-    RequestService.deleteFriendRequest(req.params.reqId).then(data =>{
+    RequestService.deleteFriendRequest(req.params.reqId, req.userId).then(data =>{
         res.sendStatus(data);
     });
 });
