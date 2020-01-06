@@ -39,7 +39,7 @@ describe("Friend list resource", () => {
 
     describe("GET /friends", () => {
         it('Should return user 1 friend list', () => {
-            return request(app).get(basePath + '/users/5df9cfb41c9d44000047b035/friends').then((response) => {
+            return request(app).get(basePath + '/users/5df9cfb41c9d44000047b035/friends').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).then((response) => {
                 expect(response.statusCode).toBe(200);
                 expect(response.body).toBeArrayOfSize(2);
             });
@@ -48,7 +48,7 @@ describe("Friend list resource", () => {
 
     describe("Delete /friends", () => {
         it('Should return status code 204', () => {
-            return request(app).delete(basePath + '/users/5df9cfb41c9d44000047b035/friends').then((response) => {
+            return request(app).delete(basePath + '/users/5df9cfb41c9d44000047b035/friends').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).then((response) => {
                 expect(response.statusCode).toBe(204);
             });
         });
@@ -56,7 +56,7 @@ describe("Friend list resource", () => {
 
     describe("Delete /friends/:id", () => {
         it('Should return status code 204', () => {
-            return request(app).delete(basePath + '/users/5df9cfb41c9d44000047b035/friends/5df9cfb41c9d44000047b036').then((response) => {
+            return request(app).delete(basePath + '/users/5df9cfb41c9d44000047b035/friends/5df9cfb41c9d44000047b036').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).then((response) => {
                 expect(response.statusCode).toBe(204);
             });
         });
@@ -94,7 +94,7 @@ describe("Request resource",()=>{
     //test Get todas las request de un user
     describe("GET /requests", () => {
         it('Should return the user 5 requests', () => {
-            return request(app).get(basePath + '/users/5df9cfb41c9d44000047b035/requests').then((response) =>{
+            return request(app).get(basePath + '/users/5df9cfb41c9d44000047b035/requests').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).then((response) =>{
                 expect(response.statusCode).toBe(200);
                 expect(response.body).toBeArrayOfSize(1);
             });
@@ -115,18 +115,18 @@ describe("Request resource",()=>{
                 callback(null);
             });
             
-            return request(app).post(basePath + '/users/5df9cfb41c9d44000047b035/requests').send(request4).then((response) =>{
+            return request(app).post(basePath + '/users/5df9cfb41c9d44000047b035/requests').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).send(request4).then((response) =>{
                 expect(response.statusCode).toBe(201);
             });
         });
 
-        it('should return 500 if there is a problem with db', () =>{
+        it('should return 400 if there is a problem with db', () =>{
             dbInsert.mockImplementation((c,callback)=>{
                 callback(true);
             });
             
-            return request(app).post(basePath + '/users/5df9cfb41c9d44000047b035/requests').send(request4).then((response) =>{
-                expect(response.statusCode).toBe(500);
+            return request(app).post(basePath + '/users/5df9cfb41c9d44000047b035/requests').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).send(request4).then((response) =>{
+                expect(response.statusCode).toBe(400);
             });
         });
     })
@@ -135,7 +135,7 @@ describe("Request resource",()=>{
     //test Delete todas las requests
     describe("DELETE /requests",() =>{
         it('Should return status code 204', () =>{
-            return request(app).delete(basePath + '/users/5df9cfb41c9d44000047b035/requests').then((response) => {
+            return request(app).delete(basePath + '/users/5df9cfb41c9d44000047b035/requests').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).then((response) => {
                 expect(response.statusCode).toBe(204);
             });
         });
@@ -149,7 +149,7 @@ describe("Request resource",()=>{
                 callback(null, request1);
             });
 
-            return request(app).get(basePath + '/users/5df9cfb41c9d44000047b035/requests/1').then((response) =>{
+            return request(app).get(basePath + '/users/5df9cfb41c9d44000047b035/requests/1').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).then((response) =>{
                 expect(response.statusCode).toBe(200);
             });
         });
@@ -159,7 +159,7 @@ describe("Request resource",()=>{
                 callback(null, null);
             });
 
-            return request(app).get(basePath + '/users/5df9cfb41c9d44000047b035/requests/99').then((response) =>{
+            return request(app).get(basePath + '/users/5df9cfb41c9d44000047b035/requests/99').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).then((response) =>{
                 expect(response.statusCode).toBe(404);
             });
         });
@@ -175,7 +175,7 @@ describe("Request resource",()=>{
                 callback(null, request1);
             });
 
-            return request(app).put(basePath + '/users/5df9cfb41c9d44000047b035/requests/1').send(modification).then((response) => {
+            return request(app).put(basePath + '/users/5df9cfb41c9d44000047b035/requests/1').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).send(modification).then((response) => {
                 expect(response.statusCode).toBe(204)
                 expect(dbUpdateOne).toBeCalledWith({"id": "1"}, modification, expect.any(Function)); 
             });
@@ -186,7 +186,7 @@ describe("Request resource",()=>{
                 callback(true);
             });
 
-            return request(app).put(basePath + '/users/5df9cfb41c9d44000047b035/requests/1').send(modification).then((response) => {
+            return request(app).put(basePath + '/users/5df9cfb41c9d44000047b035/requests/1').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).send(modification).then((response) => {
                 expect(response.statusCode).toBe(404);
             });
         });
@@ -195,7 +195,7 @@ describe("Request resource",()=>{
     //test Delete una request
     describe("Delete /requests/:id", () => {
         it('Should return status code 204', () => {
-            return request(app).delete(basePath + '/users/5df9cfb41c9d44000047b035/requests/1').then((response) => {
+            return request(app).delete(basePath + '/users/5df9cfb41c9d44000047b035/requests/1').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).then((response) => {
                 expect(response.statusCode).toBe(204);
             });
         });
@@ -205,7 +205,7 @@ describe("Request resource",()=>{
                 callback(null, null);
             });
 
-            return request(app).delete(basePath + '/users/5df9cfb41c9d44000047b035/requests/99').then((response) => {
+            return request(app).delete(basePath + '/users/5df9cfb41c9d44000047b035/requests/99').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).then((response) => {
                 expect(response.statusCode).toBe(404);
             });
         });
