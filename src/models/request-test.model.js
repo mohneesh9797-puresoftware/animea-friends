@@ -1,14 +1,14 @@
 let mongoose = require('mongoose');
 
-let requestSchema = new mongoose.Schema({
+let requestTestSchema = new mongoose.Schema({
     id: Number,
     userId: mongoose.Schema.Types.ObjectId,
     friendId: mongoose.Schema.Types.ObjectId,
     message: String
-}, {collection: 'requests'});
+}, {collection: 'requests-test'});
 
-var RequestM = mongoose.model('Request', requestSchema);
+var RequestTest = mongoose.model('RequestTest', requestTestSchema);
 
 module.exports = {
-    RequestM: RequestM
+    RequestTest: RequestTest
 };
