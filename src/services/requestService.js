@@ -225,7 +225,7 @@ class RequestService {
                         if (request.userId != logged) resolve(403);
                         else {
                             models.RequestM.updateOne({id: reqId}, req, (err) => {
-                                if (err) resolve(404);
+                                if (err) resolve(400);
                                 else resolve(204);
                             });
                         }

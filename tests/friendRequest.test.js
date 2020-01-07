@@ -187,7 +187,7 @@ describe("Request resource",()=>{
             });
 
             return request(app).put(basePath + '/users/5df9cfb41c9d44000047b035/requests/1').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZGY5Y2ZiNDFjOWQ0NDAwMDA0N2IwMzUiLCJpYXQiOjE1MTYyMzkwMjJ9.T2S6L34-jnK7kLSLdT0NIzKQcRiagGkVC8UUx_zr7Xg'}).send(modification).then((response) => {
-                expect(response.statusCode).toBe(404);
+                expect(response.statusCode).toBe(400);
             });
         });
     });
