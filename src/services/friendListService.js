@@ -8,9 +8,7 @@ class FriendListService {
     static getFriends(userId, logged) {
         return new Promise((resolve, reject) => {
             rp({
-                url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                insecure: true,
-                rejectUnauthorized: false
+                url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + userId
             }).then(() => {
                 models.FriendList.findOne({userId: userId}, (err, friends) => {
                     if (!friends) resolve([]);
@@ -20,9 +18,7 @@ class FriendListService {
                         friends.friends.forEach(friend => {
                             promises.push(new Promise((resolve, reject) => {
                                 rp({
-                                    url: 'https://185.176.5.147:7400/profile/api/profile/' + friend,
-                                    insecure: true,
-                                    rejectUnauthorized: false
+                                    url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + friend
                                 }).then((retFr) => {
                                     retFriends.push(JSON.parse(retFr));
                                     resolve();
@@ -45,9 +41,7 @@ class FriendListService {
             if (userId !== logged) resolve(403);
             else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + userId
                 }).then(() => {
                     models.FriendList.findOne({userId: userId}, (err, friends) => {
                         if (!friends) resolve(204);
@@ -75,14 +69,10 @@ class FriendListService {
             if (userId !== logged) resolve(403);
             else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + userId
                 }).then(() => {
                     rp({
-                        url: 'https://185.176.5.147:7400/profile/api/profile/' + friendId,
-                        insecure: true,
-                        rejectUnauthorized: false
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + friendId
                     }).then(() => {
                         models.FriendList.findOne({userId: userId}, (err, friends) => {
                             if (!friends || !friends.friends.includes(friendId)) resolve(404);
@@ -124,9 +114,7 @@ class FriendListService {
                         friends.friends.forEach(friend => {
                             promises.push(new Promise((resolve, reject) => {
                                 rp({
-                                    url: 'https://185.176.5.147:7400/animes/api/v1/user/' + userId + '/animes',
-                                    insecure: true,
-                                    rejectUnauthorized: false,
+                                    url: 'https://animea-gateway.herokuapp.com/animes/api/v1/user/' + userId + '/animes',
                                     headers: {
                                         'x-access-token': token,
                                         'x-user-id': userId
