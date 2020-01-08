@@ -7,39 +7,36 @@ var rp = require('request-promise');
 class FriendListService {
     static getFriends(userId, logged) {
         return new Promise((resolve, reject) => {
-            if (userId !== logged) reject(403);
-            else {
-                rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                    insecure: true,
-                    rejectUnauthorized: false
-                }).then(() => {
-                    models.FriendList.findOne({userId: userId}, (err, friends) => {
-                        if (!friends) resolve([]);
-                        else {
-                            var retFriends = [];
-                            var promises = [];
-                            friends.friends.forEach(friend => {
-                                promises.push(new Promise((resolve, reject) => {
-                                    rp({
-                                        url: 'https://185.176.5.147:7400/profile/api/profile/' + friend,
-                                        insecure: true,
-                                        rejectUnauthorized: false
-                                    }).then((retFr) => {
-                                        retFriends.push(JSON.parse(retFr));
-                                        resolve();
-                                    });
-                                }));
-                            });
-                            Promise.all(promises).then(() => {
-                                resolve(retFriends);
-                            });
-                        };
-                    });
-                }).catch(() => {
-                    reject(404);
+            rp({
+                url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
+                insecure: true,
+                rejectUnauthorized: false
+            }).then(() => {
+                models.FriendList.findOne({userId: userId}, (err, friends) => {
+                    if (!friends) resolve([]);
+                    else {
+                        var retFriends = [];
+                        var promises = [];
+                        friends.friends.forEach(friend => {
+                            promises.push(new Promise((resolve, reject) => {
+                                rp({
+                                    url: 'https://185.176.5.147:7400/profile/api/profile/' + friend,
+                                    insecure: true,
+                                    rejectUnauthorized: false
+                                }).then((retFr) => {
+                                    retFriends.push(JSON.parse(retFr));
+                                    resolve();
+                                });
+                            }));
+                        });
+                        Promise.all(promises).then(() => {
+                            resolve(retFriends);
+                        });
+                    };
                 });
-            }
+            }).catch(() => {
+                reject(404);
+            });
         });
     }
 
@@ -110,6 +107,43 @@ class FriendListService {
                     });
                 }).catch(() => {
                     resolve(404);
+                });
+            }
+        });
+    }
+
+    static getFriendAnimes(userId, logged, token) {
+        return new Promise((resolve, reject) => {
+            if (userId !== logged) reject(403);
+            else {
+                models.FriendList.findOne({userId: userId}, (err, friends) => {
+                    if (!friends) reject(404);
+                    else {
+                        var promises = [];
+                        var animes = [];
+                        friends.friends.forEach(friend => {
+                            promises.push(new Promise((resolve, reject) => {
+                                rp({
+                                    url: 'https://185.176.5.147:7400/animes/api/v1/user/' + userId + '/animes',
+                                    insecure: true,
+                                    rejectUnauthorized: false,
+                                    headers: {
+                                        'x-access-token': token,
+                                        'x-user-id': userId
+                                    }
+                                }).then(franimes => {
+                                    animes.concat(JSON.parse(franimes));
+                                    resolve();
+                                });
+                            }));
+                        });
+                        Promise.all(promises).then(() => {
+                            var uniqueAnimes = animes.filter(function(item, pos, self) {
+                                return self.indexOf(item) == pos;
+                            });
+                            resolve(uniqueAnimes);
+                        });
+                    }
                 });
             }
         });
