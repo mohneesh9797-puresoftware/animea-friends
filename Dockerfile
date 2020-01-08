@@ -9,6 +9,6 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3002
+EXPOSE $FRIENDS_PORT
 
 CMD npm start

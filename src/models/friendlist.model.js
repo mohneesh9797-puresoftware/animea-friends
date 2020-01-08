@@ -1,9 +1,9 @@
 let mongoose = require('mongoose');
 
 let friendListSchema = new mongoose.Schema({
-    userId: Number,
-    friends: [Number]
-});
+    userId: mongoose.Schema.Types.ObjectId,
+    friends: [mongoose.Schema.Types.ObjectId]
+}, {collection: 'friends'});
 
 var FriendList = mongoose.model('FriendList', friendListSchema);
 
