@@ -5,6 +5,8 @@ let friendModels = require('../models/friendlist.model');
 var Promise = require('bluebird');
 var rp = require('request-promise');
 
+var cachedProfiles = new Map();
+
 class RequestService {
     static getRequests(userId, received, logged) {
         return new Promise((resolve, reject) => {
@@ -63,16 +65,42 @@ class RequestService {
 
     static getRequestData(request) {
         return new Promise((resolve, reject) => {
-            rp({
-                url: 'https://185.176.5.147:7400/profile/api/profile/' + request.userId,
-                insecure: true,
-                rejectUnauthorized: false
-            }).then((user) => {
+            if (cachedProfiles.has(request.userId)) {
+                console.log('Retrieving user from cache');
+                var user = cachedProfiles.get(request.userId);
+                if (cachedProfiles.has(request.friendId)) {
+                    console.log('Retrieving friend from cache');
+                    var friend = cachedProfiles.get(request.friendId);
+                    resolve({
+                        id: request.id,
+                        user: JSON.parse(user),
+                        friend: JSON.parse(friend),
+                        message: request.message
+                    });
+                } else {
+                    rp({
+                        url: 'https://185.176.5.147:7400/profile/api/profile/' + request.friendId,
+                        insecure: true,
+                        rejectUnauthorized: false
+                    }).then((friend) => {
+                        cachedProfiles.set(request.friendId, friend);
+                        resolve({
+                            id: request.id,
+                            user: JSON.parse(user),
+                            friend: JSON.parse(friend),
+                            message: request.message
+                        });
+                    });
+                }
+            } else if (cachedProfiles.has(request.friendId)) {
+                console.log('Retrieving friend from cache');
+                var friend = cachedProfiles.get(request.friendId);
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + request.friendId,
+                    url: 'https://185.176.5.147:7400/profile/api/profile/' + request.userId,
                     insecure: true,
                     rejectUnauthorized: false
-                }).then((friend) => {
+                }).then((user) => {
+                    cachedProfiles.set(request.userId, user);
                     resolve({
                         id: request.id,
                         user: JSON.parse(user),
@@ -80,7 +108,28 @@ class RequestService {
                         message: request.message
                     });
                 });
-            });
+            } else {
+                rp({
+                    url: 'https://185.176.5.147:7400/profile/api/profile/' + request.userId,
+                    insecure: true,
+                    rejectUnauthorized: false
+                }).then((user) => {
+                    cachedProfiles.set(request.userId, user);
+                    rp({
+                        url: 'https://185.176.5.147:7400/profile/api/profile/' + request.friendId,
+                        insecure: true,
+                        rejectUnauthorized: false
+                    }).then((friend) => {
+                        cachedProfiles.set(request.friendId, friend);
+                        resolve({
+                            id: request.id,
+                            user: JSON.parse(user),
+                            friend: JSON.parse(friend),
+                            message: request.message
+                        });
+                    });
+                });
+            }
         });
     }
     
