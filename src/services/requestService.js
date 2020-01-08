@@ -13,9 +13,7 @@ class RequestService {
             if (userId !== logged && !received) reject(403);
             else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + userId
                 }).then((user) => {
                     if(!received){
                         models.RequestM.find({userId: userId}, (err, requests) => {
@@ -79,9 +77,7 @@ class RequestService {
                     });
                 } else {
                     rp({
-                        url: 'https://185.176.5.147:7400/profile/api/profile/' + request.friendId,
-                        insecure: true,
-                        rejectUnauthorized: false
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + request.friendId
                     }).then((friend) => {
                         cachedProfiles.set(request.friendId, friend);
                         resolve({
@@ -96,9 +92,7 @@ class RequestService {
                 console.log('Retrieving friend from cache');
                 var friend = cachedProfiles.get(request.friendId);
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + request.userId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + request.userId
                 }).then((user) => {
                     cachedProfiles.set(request.userId, user);
                     resolve({
@@ -110,15 +104,11 @@ class RequestService {
                 });
             } else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + request.userId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + request.userId
                 }).then((user) => {
                     cachedProfiles.set(request.userId, user);
                     rp({
-                        url: 'https://185.176.5.147:7400/profile/api/profile/' + request.friendId,
-                        insecure: true,
-                        rejectUnauthorized: false
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + request.friendId
                     }).then((friend) => {
                         cachedProfiles.set(request.friendId, friend);
                         resolve({
@@ -138,14 +128,10 @@ class RequestService {
             if (req.userId !== logged) resolve(403);
             else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + req.userId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + req.userId
                 }).then(() => {
                     rp({
-                        url: 'https://185.176.5.147:7400/profile/api/profile/' + req.friendId,
-                        insecure: true,
-                        rejectUnauthorized: false
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + req.friendId
                     }).then(() => {
                         models.RequestM.findOne({userId: req.userId, friendId: req.friendId}, (err, res) => {
                             if (res) resolve(400);
@@ -230,9 +216,7 @@ class RequestService {
             if (userId !== logged) reject(403);
             else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + userId
                 }).then(() => {
                     models.RequestM.deleteMany({userId: userId},(err)=>{
                         if(err) resolve(404)
