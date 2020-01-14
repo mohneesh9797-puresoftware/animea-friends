@@ -8,7 +8,7 @@ class FriendListService {
     static getFriends(userId, logged) {
         return new Promise((resolve, reject) => {
             rp({
-                url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + userId
+                url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
             }).then(() => {
                 models.FriendList.findOne({userId: userId}, (err, friends) => {
                     if (!friends) resolve([]);
@@ -18,7 +18,7 @@ class FriendListService {
                         friends.friends.forEach(friend => {
                             promises.push(new Promise((resolve, reject) => {
                                 rp({
-                                    url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + friend
+                                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + friend
                                 }).then((retFr) => {
                                     retFriends.push(JSON.parse(retFr));
                                     resolve();
@@ -41,7 +41,7 @@ class FriendListService {
             if (userId !== logged) resolve(403);
             else {
                 rp({
-                    url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + userId
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
                 }).then(() => {
                     models.FriendList.findOne({userId: userId}, (err, friends) => {
                         if (!friends) resolve(204);
@@ -69,10 +69,10 @@ class FriendListService {
             if (userId !== logged) resolve(403);
             else {
                 rp({
-                    url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + userId
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
                 }).then(() => {
                     rp({
-                        url: 'https://animea-gateway.herokuapp.com/profile/api/profile/' + friendId
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + friendId
                     }).then(() => {
                         models.FriendList.findOne({userId: userId}, (err, friends) => {
                             if (!friends || !friends.friends.includes(friendId)) resolve(404);

@@ -5,6 +5,8 @@ const request = require('supertest');
 
 var basePath = '/api/v1';
 
+jest.setTimeout(60000);
+
 //Test
 describe("HW test", () =>{
 
