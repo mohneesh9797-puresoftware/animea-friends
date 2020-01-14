@@ -6,7 +6,6 @@ let friendListRoute = require('./routes/friendList');
 let requestRoute = require('./routes/request');
 let path = require('path');
 let bodyParser = require('body-parser');
-let mongoose = require('mongoose');
 let database = require('../db');
 var jwt = require('jsonwebtoken');
 
