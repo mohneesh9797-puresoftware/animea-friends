@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: animea-friends-deployment
+  labels:
+    app: animea-friends
+spec:
+  selector:
+    matchLabels:
+      app: animea-friends
+  template:
+    metadata:
+      labels:
+        app: animea-friends
+    spec:
+      containers:
+      - name: animea-friends
+        image: raffrearaus/animea-friends
+        ports:
+        - containerPort: 8080
+          name: http-port
+        env:
+        - name: NODE_ENV
+          value: production
+        - name: PORT
+          value: "8080"
