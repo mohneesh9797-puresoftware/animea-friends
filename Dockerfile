@@ -1,4 +1,4 @@
-FROM arm32v7/node:10-alpine
+FROM node:10-alpine
 
 WORKDIR /app
 
@@ -9,6 +9,6 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3002
+EXPOSE 3003
 
 CMD npm start

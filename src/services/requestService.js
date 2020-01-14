@@ -5,71 +5,96 @@ let friendModels = require('../models/friendlist.model');
 var Promise = require('bluebird');
 var rp = require('request-promise');
 
+var cachedProfiles = new Map();
+
 class RequestService {
-    static getRequests(userId,received) {
+    static getRequests(userId, received, logged) {
         return new Promise((resolve, reject) => {
-            rp({
-                url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                insecure: true,
-                rejectUnauthorized: false
-            }).then((user) => {
-                if(!received){
-                    models.RequestM.find({userId: userId}, (err, requests) => {
-                        if (err) reject(404);
-                        else {
-                            var promises = [];
-                            var retReqs = [];
-                            requests.forEach(req => {
-                                promises.push(new Promise((resolve, reject) => {
-                                    this.getRequestData(req).then(retReq => {
-                                        retReqs.push(retReq);
-                                        resolve();
-                                    });
-                                }));
-                            });
-                            Promise.all(promises).then(() => {
-                                resolve(retReqs);
-                            });
-                        }
-                    });
-                }else{
-                    models.RequestM.find({friendId: userId}, (err, requests) => {
-                        if (err) reject(404);
-                        else {
-                            var promises = [];
-                            var retReqs = [];
-                            requests.forEach(req => {
-                                promises.push(new Promise((resolve, reject) => {
-                                    this.getRequestData(req).then(retReq => {
-                                        retReqs.push(retReq);
-                                        resolve();
-                                    });
-                                }));
-                            });
-                            Promise.all(promises).then(() => {
-                                resolve(retReqs);
-                            });
-                        }
-                    });
-                }
-            }).catch(() => {
-                reject(404);
-            });
+            if (userId !== logged && !received) reject(403);
+            else {
+                rp({
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
+                }).then((user) => {
+                    if(!received){
+                        models.RequestM.find({userId: userId}, (err, requests) => {
+                            if (err) reject(404);
+                            else {
+                                var promises = [];
+                                var retReqs = [];
+                                requests.forEach(req => {
+                                    promises.push(new Promise((resolve, reject) => {
+                                        this.getRequestData(req).then(retReq => {
+                                            retReqs.push(retReq);
+                                            resolve();
+                                        });
+                                    }));
+                                });
+                                Promise.all(promises).then(() => {
+                                    resolve(retReqs);
+                                });
+                            }
+                        });
+                    }else{
+                        models.RequestM.find({friendId: userId}, (err, requests) => {
+                            if (err) reject(404);
+                            else {
+                                var promises = [];
+                                var retReqs = [];
+                                requests.forEach(req => {
+                                    promises.push(new Promise((resolve, reject) => {
+                                        this.getRequestData(req).then(retReq => {
+                                            retReqs.push(retReq);
+                                            resolve();
+                                        });
+                                    }));
+                                });
+                                Promise.all(promises).then(() => {
+                                    resolve(retReqs);
+                                });
+                            }
+                        });
+                    }
+                }).catch(() => {
+                    reject(404);
+                });
+            }
         });
     }
 
     static getRequestData(request) {
         return new Promise((resolve, reject) => {
-            rp({
-                url: 'https://185.176.5.147:7400/profile/api/profile/' + request.userId,
-                insecure: true,
-                rejectUnauthorized: false
-            }).then((user) => {
+            if (cachedProfiles.has(request.userId)) {
+                console.log('Retrieving user from cache');
+                var user = cachedProfiles.get(request.userId);
+                if (cachedProfiles.has(request.friendId)) {
+                    console.log('Retrieving friend from cache');
+                    var friend = cachedProfiles.get(request.friendId);
+                    resolve({
+                        id: request.id,
+                        user: JSON.parse(user),
+                        friend: JSON.parse(friend),
+                        message: request.message
+                    });
+                } else {
+                    rp({
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + request.friendId
+                    }).then((friend) => {
+                        cachedProfiles.set(request.friendId, friend);
+                        resolve({
+                            id: request.id,
+                            user: JSON.parse(user),
+                            friend: JSON.parse(friend),
+                            message: request.message
+                        });
+                    });
+                }
+            } else if (cachedProfiles.has(request.friendId)) {
+                console.log('Retrieving friend from cache');
+                var friend = cachedProfiles.get(request.friendId);
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + request.friendId,
-                    insecure: true,
-                    rejectUnauthorized: false
-                }).then((friend) => {
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + request.userId
+                }).then((user) => {
+                    cachedProfiles.set(request.userId, user);
                     resolve({
                         id: request.id,
                         user: JSON.parse(user),
@@ -77,122 +102,142 @@ class RequestService {
                         message: request.message
                     });
                 });
-            });
+            } else {
+                rp({
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + request.userId
+                }).then((user) => {
+                    cachedProfiles.set(request.userId, user);
+                    rp({
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + request.friendId
+                    }).then((friend) => {
+                        cachedProfiles.set(request.friendId, friend);
+                        resolve({
+                            id: request.id,
+                            user: JSON.parse(user),
+                            friend: JSON.parse(friend),
+                            message: request.message
+                        });
+                    });
+                });
+            }
         });
     }
     
-    static createRequest(req) {
+    static createRequest(req, logged) {
         return new Promise((resolve, reject) => {
-            rp({
-                url: 'https://185.176.5.147:7400/profile/api/profile/' + req.userId,
-                insecure: true,
-                rejectUnauthorized: false
-            }).then(() => {
+            if (req.userId !== logged) resolve(403);
+            else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + req.friendId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + req.userId
                 }).then(() => {
-                    models.RequestM.findOne({userId: req.userId, friendId: req.friendId}, (err, res) => {
-                        if (res) resolve(400);
-                        else {
-                            friendModels.FriendList.findOne({userId: req.userId}, (err, friends) => {
-                                if (!friends || !friends.friends.includes(req.friendId)) {
-                                    req.id = Math.round(Math.random() * 1000);
-                                    models.RequestM.create(req, (err) => {
-                                        if (!err) resolve(201);
-                                        else resolve(500);
-                                    });
-                                } else {
-                                    resolve(400);
-                                }
-                            });
-                        }
+                    rp({
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + req.friendId
+                    }).then(() => {
+                        models.RequestM.findOne({userId: req.userId, friendId: req.friendId}, (err, res) => {
+                            if (res) resolve(400);
+                            else {
+                                friendModels.FriendList.findOne({userId: req.userId}, (err, friends) => {
+                                    if (!friends || !friends.friends.includes(req.friendId)) {
+                                        req.id = Math.round(Math.random() * 1000);
+                                        models.RequestM.create(req, (err) => {
+                                            if (!err) resolve(201);
+                                            else resolve(400);
+                                        });
+                                    } else {
+                                        resolve(400);
+                                    }
+                                });
+                            }
+                        });
+                    }).catch(() => {
+                        resolve(404);
                     });
                 }).catch(() => {
                     resolve(404);
                 });
-            }).catch(() => {
-                resolve(404);
-            });
+            }
         });
     }
 
-    static acceptRequest(reqId) {
+    static acceptRequest(reqId, logged) {
         return new Promise((resolve, reject) => {
             models.RequestM.findOne({id: reqId}, (err, req) => {
                 if (req) {
-                    friendModels.FriendList.findOne({userId: req.userId}, (err, friends) => {
-                        if (!friends) {
-                            friendModels.FriendList.create({
-                                userId: req.userId,
-                                friends: [req.friendId]
-                            }, (err) => {
-                                models.RequestM.deleteOne({id: reqId}, (err) => {
-                                    resolve(204);
+                    if (req.friendId != logged) resolve(403);
+                    else {
+                        friendModels.FriendList.findOne({userId: req.userId}, (err, friends) => {
+                            if (!friends) {
+                                friendModels.FriendList.create({
+                                    userId: req.userId,
+                                    friends: [req.friendId]
+                                }, (err) => {
+                                    models.RequestM.deleteOne({id: reqId}, (err) => {
+                                        resolve(204);
+                                    });
                                 });
-                            });
-                        } else {
-                            friends.friends.push(req.friendId);
-                            friendModels.FriendList.updateOne({userId: req.userId}, {friends: friends.friends}, (err) => {
-                                models.RequestM.deleteOne({id: reqId}, (err) => {
-                                    resolve(204);
+                            } else {
+                                friends.friends.push(req.friendId);
+                                friendModels.FriendList.updateOne({userId: req.userId}, {friends: friends.friends}, (err) => {
+                                    models.RequestM.deleteOne({id: reqId}, (err) => {
+                                        resolve(204);
+                                    });
                                 });
-                            });
-                        }
-                    });
-                    //buscar el amigo y actualizarle la lista de amigos al aceptar la request
-                    friendModels.FriendList.findOne({userId: req.friendId}, (err, friends) => {
-                        if (!friends) {
-                            friendModels.FriendList.create({
-                                userId: req.friendId,
-                                friends: [req.userId]
-                            }, (err) => {
-                                models.RequestM.deleteOne({id: reqId}, (err) => {
-                                    resolve(204);
+                            }
+                        });
+                        //buscar el amigo y actualizarle la lista de amigos al aceptar la request
+                        friendModels.FriendList.findOne({userId: req.friendId}, (err, friends) => {
+                            if (!friends) {
+                                friendModels.FriendList.create({
+                                    userId: req.friendId,
+                                    friends: [req.userId]
+                                }, (err) => {
+                                    models.RequestM.deleteOne({id: reqId}, (err) => {
+                                        resolve(204);
+                                    });
                                 });
-                            });
-                        } else {
-                            friends.friends.push(req.userId);
-                            friendModels.FriendList.updateOne({userId: req.friendId}, {friends: friends.friends}, (err) => {
-                                models.RequestM.deleteOne({id: reqId}, (err) => {
-                                    resolve(204);
+                            } else {
+                                friends.friends.push(req.userId);
+                                friendModels.FriendList.updateOne({userId: req.friendId}, {friends: friends.friends}, (err) => {
+                                    models.RequestM.deleteOne({id: reqId}, (err) => {
+                                        resolve(204);
+                                    });
                                 });
-                            });
-                        }
-                    });
-
-                } else resolve(404)
+                            }
+                        });
+                    }
+                } else resolve(404);
             });
         });
     }
 
     //Funciona
-    static deleteAllRequests(userId){
+    static deleteAllRequests(userId, logged){
         return new Promise((resolve,reject)=>{
-            rp({
-                url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                insecure: true,
-                rejectUnauthorized: false
-            }).then(() => {
-                models.RequestM.deleteMany({userId: userId},(err)=>{
-                    if(err) resolve(404)
-                    else resolve(204);
+            if (userId !== logged) reject(403);
+            else {
+                rp({
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
+                }).then(() => {
+                    models.RequestM.deleteMany({userId: userId},(err)=>{
+                        if(err) resolve(404)
+                        else resolve(204);
+                    });
+                }).catch(() => {
+                    resolve(404);
                 });
-            }).catch(() => {
-                resolve(404);
-            })
+            }
         });
     }
 
     //Funciona
-    static getFriendRequest(reqId){
+    static getFriendRequest(reqId, logged){
         return new Promise((resolve,reject) =>{
             models.RequestM.findOne({id: reqId},(err,request) =>{
                 if(err) reject(404);
                 else{
                     if (!request) reject(404);
                     else {
+                        if (request.userId != logged && request.friendId != logged) reject(403);
                         this.getRequestData(request).then(req => {
                             resolve(req);
                         });
@@ -203,17 +248,20 @@ class RequestService {
     }
 
     //TRY
-    static updateFriendRequest(reqId, req){
+    static updateFriendRequest(reqId, req, logged){
         return new Promise(function (resolve,reject){
             models.RequestM.findOne({id: reqId},(err,request) =>{
                 if(err) resolve(404);
                 else{
                     if (!request) resolve(404);
                     else {
-                        models.RequestM.updateOne({id: reqId}, req, (err) => {
-                            if (err) resolve(404);
-                            else resolve(204);
-                        });
+                        if (request.userId != logged) resolve(403);
+                        else {
+                            models.RequestM.updateOne({id: reqId}, req, (err) => {
+                                if (err) resolve(400);
+                                else resolve(204);
+                            });
+                        }
                     }
                 }
             });
@@ -221,17 +269,20 @@ class RequestService {
     }
 
     //Funciona
-    static deleteFriendRequest(reqId){
+    static deleteFriendRequest(reqId, logged){
         return new Promise((resolve,reject) =>{
             models.RequestM.findOne({id: reqId},(err,request) =>{
                 if(err) resolve(404);
                 else{
                     if (!request) resolve(404);
                     else {
-                        models.RequestM.deleteOne({id: reqId}, (err) => {
-                            if (err) resolve(404);
-                            else resolve(204);
-                        });
+                        if (request.userId != logged) resolve(403);
+                        else {
+                            models.RequestM.deleteOne({id: reqId}, (err) => {
+                                if (err) resolve(404);
+                                else resolve(204);
+                            });
+                        }
                     }
                 }
             });

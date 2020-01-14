@@ -3,6 +3,9 @@ const fmodels = require('../src/models/friendlist.model');
 const rmodels = require('../src/models/request.model');
 const request = require('supertest');
 
+var basePath = '/api/v1';
+
+jest.setTimeout(60000);
 
 //Test
 describe("HW test", () =>{
@@ -18,7 +21,7 @@ describe("HW test", () =>{
 
 describe("Friend list resource", () => {
     beforeAll(() => {
-        const friendList = new fmodels.FriendList({"userId": "5df9cfb41c9d44000047b035", "friends": ["5df9cfb41c9d44000047b036", "5df9cfb41c9d44000047b037"]});
+        const friendList = new fmodels.FriendList({"userId": "5e145acd5591df48f0316f02", "friends": ["5e145b225591df48f0316f03", "5e145b3c5591df48f0316f05"]});
 
         dbFindOne = jest.spyOn(fmodels.FriendList, "findOne");
         dbFindOne.mockImplementation((query, callback) => {
@@ -38,7 +41,7 @@ describe("Friend list resource", () => {
 
     describe("GET /friends", () => {
         it('Should return user 1 friend list', () => {
-            return request(app).get('/users/5df9cfb41c9d44000047b035/friends').then((response) => {
+            return request(app).get(basePath + '/users/5e145acd5591df48f0316f02/friends').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).then((response) => {
                 expect(response.statusCode).toBe(200);
                 expect(response.body).toBeArrayOfSize(2);
             });
@@ -47,7 +50,7 @@ describe("Friend list resource", () => {
 
     describe("Delete /friends", () => {
         it('Should return status code 204', () => {
-            return request(app).delete('/users/5df9cfb41c9d44000047b035/friends').then((response) => {
+            return request(app).delete(basePath + '/users/5e145acd5591df48f0316f02/friends').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).then((response) => {
                 expect(response.statusCode).toBe(204);
             });
         });
@@ -55,7 +58,7 @@ describe("Friend list resource", () => {
 
     describe("Delete /friends/:id", () => {
         it('Should return status code 204', () => {
-            return request(app).delete('/users/5df9cfb41c9d44000047b035/friends/5df9cfb41c9d44000047b036').then((response) => {
+            return request(app).delete(basePath + '/users/5e145acd5591df48f0316f02/friends/5e145b225591df48f0316f03').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).then((response) => {
                 expect(response.statusCode).toBe(204);
             });
         });
@@ -64,9 +67,9 @@ describe("Friend list resource", () => {
 
 describe("Request resource",()=>{
     beforeAll(()=>{                     //Creo que hay que crearlas como alicia, con su id seteado. En postman ->  "id": xxx
-        const request1 = new rmodels.RequestM({"userId":"5df9cfb41c9d44000047b035", "friendId":"5df9cfb41c9d44000047b036", "message":"Solicitud 1", "id":"1"});
-        const request2 = new rmodels.RequestM({"userId":"5df9cfb41c9d44000047b035", "friendId":2, "message":"Solicitud 2", "id":"2"});
-        const request3 = new rmodels.RequestM({"userId":"5df9cfb41c9d44000047b035", "friendId":3, "message":"Solicitud 3", "id":"3"});
+        const request1 = new rmodels.RequestM({"userId":"5e145acd5591df48f0316f02", "friendId":"5e145b225591df48f0316f03", "message":"Solicitud 1", "id":"1"});
+        const request2 = new rmodels.RequestM({"userId":"5e145acd5591df48f0316f02", "friendId":2, "message":"Solicitud 2", "id":"2"});
+        const request3 = new rmodels.RequestM({"userId":"5e145acd5591df48f0316f02", "friendId":3, "message":"Solicitud 3", "id":"3"});
     
 
         dbFind = jest.spyOn(rmodels.RequestM, "find");
@@ -93,7 +96,7 @@ describe("Request resource",()=>{
     //test Get todas las request de un user
     describe("GET /requests", () => {
         it('Should return the user 5 requests', () => {
-            return request(app).get('/users/5df9cfb41c9d44000047b035/requests').then((response) =>{
+            return request(app).get(basePath + '/users/5e145acd5591df48f0316f02/requests').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).then((response) =>{
                 expect(response.statusCode).toBe(200);
                 expect(response.body).toBeArrayOfSize(1);
             });
@@ -102,7 +105,7 @@ describe("Request resource",()=>{
 
     //test Post una request
     describe("POST /request", ()=> {
-        const request4 = {"userId":"5df9cfb41c9d44000047b035", "friendId":"5df9cfb41c9d44000047b037", "message":"Solicitud 4", "id":"4"};
+        const request4 = {"userId":"5e145acd5591df48f0316f02", "friendId":"5e145b3c5591df48f0316f05", "message":"Solicitud 4", "id":"4"};
         dbFindOne = jest.spyOn(rmodels.RequestM, "findOne");
         dbInsert = jest.spyOn(rmodels.RequestM, "create");
 
@@ -114,18 +117,18 @@ describe("Request resource",()=>{
                 callback(null);
             });
             
-            return request(app).post('/users/5df9cfb41c9d44000047b035/requests').send(request4).then((response) =>{
+            return request(app).post(basePath + '/users/5e145acd5591df48f0316f02/requests').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).send(request4).then((response) =>{
                 expect(response.statusCode).toBe(201);
             });
         });
 
-        it('should return 500 if there is a problem with db', () =>{
+        it('should return 400 if there is a problem with db', () =>{
             dbInsert.mockImplementation((c,callback)=>{
                 callback(true);
             });
             
-            return request(app).post('/users/5df9cfb41c9d44000047b035/requests').send(request4).then((response) =>{
-                expect(response.statusCode).toBe(500);
+            return request(app).post(basePath + '/users/5e145acd5591df48f0316f02/requests').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).send(request4).then((response) =>{
+                expect(response.statusCode).toBe(400);
             });
         });
     })
@@ -134,7 +137,7 @@ describe("Request resource",()=>{
     //test Delete todas las requests
     describe("DELETE /requests",() =>{
         it('Should return status code 204', () =>{
-            return request(app).delete('/users/5df9cfb41c9d44000047b035/requests').then((response) => {
+            return request(app).delete(basePath + '/users/5e145acd5591df48f0316f02/requests').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).then((response) => {
                 expect(response.statusCode).toBe(204);
             });
         });
@@ -143,12 +146,12 @@ describe("Request resource",()=>{
     //test Get una request concreta  (200 si existe 404 si no)
     describe("GET /request/:id", () => {
         it('Should return the request', () =>{
-            const request1 = new rmodels.RequestM({"userId":"5df9cfb41c9d44000047b035", "friendId":"5df9cfb41c9d44000047b036", "message":"Solicitud 1", "id":"1"});
+            const request1 = new rmodels.RequestM({"userId":"5e145acd5591df48f0316f02", "friendId":"5e145b225591df48f0316f03", "message":"Solicitud 1", "id":"1"});
             dbFindOne.mockImplementation((query, callback) =>{
                 callback(null, request1);
             });
 
-            return request(app).get('/users/5df9cfb41c9d44000047b035/requests/1').then((response) =>{
+            return request(app).get(basePath + '/users/5e145acd5591df48f0316f02/requests/1').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).then((response) =>{
                 expect(response.statusCode).toBe(200);
             });
         });
@@ -158,7 +161,7 @@ describe("Request resource",()=>{
                 callback(null, null);
             });
 
-            return request(app).get('/users/5df9cfb41c9d44000047b035/requests/99').then((response) =>{
+            return request(app).get(basePath + '/users/5e145acd5591df48f0316f02/requests/99').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).then((response) =>{
                 expect(response.statusCode).toBe(404);
             });
         });
@@ -166,15 +169,15 @@ describe("Request resource",()=>{
 
     //test Put una request      No se si en el const hay que añadir el id
     describe("PUT /requests/:id", () => {
-        const modification = {"userId":"5df9cfb41c9d44000047b035", "friendId":"5df9cfb41c9d44000047b036", "message":"Modification", "id":"1"};
+        const modification = {"userId":"5e145acd5591df48f0316f02", "friendId":"5e145b225591df48f0316f03", "message":"Modification", "id":"1"};
 
         it('Should modify the request if everything is fine', () => {
-            const request1 = new rmodels.RequestM({"userId":"5df9cfb41c9d44000047b035", "friendId":"5df9cfb41c9d44000047b036", "message":"Solicitud 1", "id":"1"});
+            const request1 = new rmodels.RequestM({"userId":"5e145acd5591df48f0316f02", "friendId":"5e145b225591df48f0316f03", "message":"Solicitud 1", "id":"1"});
             dbFindOne.mockImplementation((query, callback) =>{
                 callback(null, request1);
             });
 
-            return request(app).put('/users/5df9cfb41c9d44000047b035/requests/1').send(modification).then((response) => {
+            return request(app).put(basePath + '/users/5e145acd5591df48f0316f02/requests/1').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).send(modification).then((response) => {
                 expect(response.statusCode).toBe(204)
                 expect(dbUpdateOne).toBeCalledWith({"id": "1"}, modification, expect.any(Function)); 
             });
@@ -185,8 +188,8 @@ describe("Request resource",()=>{
                 callback(true);
             });
 
-            return request(app).put('/users/5df9cfb41c9d44000047b035/requests/1').send(modification).then((response) => {
-                expect(response.statusCode).toBe(404);
+            return request(app).put(basePath + '/users/5e145acd5591df48f0316f02/requests/1').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).send(modification).then((response) => {
+                expect(response.statusCode).toBe(400);
             });
         });
     });
@@ -194,7 +197,7 @@ describe("Request resource",()=>{
     //test Delete una request
     describe("Delete /requests/:id", () => {
         it('Should return status code 204', () => {
-            return request(app).delete('/users/5df9cfb41c9d44000047b035/requests/1').then((response) => {
+            return request(app).delete(basePath + '/users/5e145acd5591df48f0316f02/requests/1').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).then((response) => {
                 expect(response.statusCode).toBe(204);
             });
         });
@@ -204,7 +207,7 @@ describe("Request resource",()=>{
                 callback(null, null);
             });
 
-            return request(app).delete('/users/5df9cfb41c9d44000047b035/requests/99').then((response) => {
+            return request(app).delete(basePath + '/users/5e145acd5591df48f0316f02/requests/99').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).then((response) => {
                 expect(response.statusCode).toBe(404);
             });
         });

@@ -5,12 +5,10 @@ var Promise = require('bluebird');
 var rp = require('request-promise');
 
 class FriendListService {
-    static getFriends(userId) {
+    static getFriends(userId, logged) {
         return new Promise((resolve, reject) => {
             rp({
-                url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                insecure: true,
-                rejectUnauthorized: false
+                url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
             }).then(() => {
                 models.FriendList.findOne({userId: userId}, (err, friends) => {
                     if (!friends) resolve([]);
@@ -20,9 +18,7 @@ class FriendListService {
                         friends.friends.forEach(friend => {
                             promises.push(new Promise((resolve, reject) => {
                                 rp({
-                                    url: 'https://185.176.5.147:7400/profile/api/profile/' + friend,
-                                    insecure: true,
-                                    rejectUnauthorized: false
+                                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + friend
                                 }).then((retFr) => {
                                     retFriends.push(JSON.parse(retFr));
                                     resolve();
@@ -40,59 +36,23 @@ class FriendListService {
         });
     }
 
-    static removeFriends(userId) {
+    static removeFriends(userId, logged) {
         return new Promise((resolve, reject) => {
-            rp({
-                url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                insecure: true,
-                rejectUnauthorized: false
-            }).then(() => {
-                models.FriendList.findOne({userId: userId}, (err, friends) => {
-                    if (!friends) resolve(204);
-                    else {
-                        models.FriendList.deleteOne({userId: userId}, (err) => {
-                            var promises = [];
-                            friends.friends.forEach(friend => {
-                                return this.removeFriend(friend, userId);
-                            });
-                            Promise.all(promises).then(() => {
-                                resolve(204);
-                            });
-                        });
-                    }
-                });
-            }).catch(() => {
-                resolve(404);
-            });
-        });
-    }
-
-    static removeFriend(userId, friendId) {
-        return new Promise((resolve, reject) => {
-            rp({
-                url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                insecure: true,
-                rejectUnauthorized: false
-            }).then(() => {
+            if (userId !== logged) resolve(403);
+            else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + friendId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
                 }).then(() => {
                     models.FriendList.findOne({userId: userId}, (err, friends) => {
-                        if (!friends || !friends.friends.includes(friendId)) resolve(404);
-                        else  {
-                            var friendIndex = friends.friends.indexOf(friendId);
-                            var friendsCopy = friends.friends;
-                            friendsCopy.splice(friendIndex, 1);
-                            models.FriendList.updateOne({userId: userId}, {friends: friendsCopy}, (err) => {
-                                models.FriendList.findOne({userId: friendId}, (err, friends2) => {
-                                    var friendIndex2 = friends2.friends.indexOf(userId);
-                                    var friendsCopy2 = friends2.friends;
-                                    friendsCopy2.splice(friendIndex2, 1);
-                                    models.FriendList.updateOne({userId: friendId}, {friends: friendsCopy2}, (err) => {
-                                        resolve(204);
-                                    });
+                        if (!friends) resolve(204);
+                        else {
+                            models.FriendList.deleteOne({userId: userId}, (err) => {
+                                var promises = [];
+                                friends.friends.forEach(friend => {
+                                    return this.removeFriend(friend, userId);
+                                });
+                                Promise.all(promises).then(() => {
+                                    resolve(204);
                                 });
                             });
                         }
@@ -100,9 +60,80 @@ class FriendListService {
                 }).catch(() => {
                     resolve(404);
                 });
-            }).catch(() => {
-                resolve(404);
-            });
+            }
+        });
+    }
+
+    static removeFriend(userId, friendId, logged) {
+        return new Promise((resolve, reject) => {
+            if (userId !== logged) resolve(403);
+            else {
+                rp({
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
+                }).then(() => {
+                    rp({
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + friendId
+                    }).then(() => {
+                        models.FriendList.findOne({userId: userId}, (err, friends) => {
+                            if (!friends || !friends.friends.includes(friendId)) resolve(404);
+                            else  {
+                                var friendIndex = friends.friends.indexOf(friendId);
+                                var friendsCopy = friends.friends;
+                                friendsCopy.splice(friendIndex, 1);
+                                models.FriendList.updateOne({userId: userId}, {friends: friendsCopy}, (err) => {
+                                    models.FriendList.findOne({userId: friendId}, (err, friends2) => {
+                                        var friendIndex2 = friends2.friends.indexOf(userId);
+                                        var friendsCopy2 = friends2.friends;
+                                        friendsCopy2.splice(friendIndex2, 1);
+                                        models.FriendList.updateOne({userId: friendId}, {friends: friendsCopy2}, (err) => {
+                                            resolve(204);
+                                        });
+                                    });
+                                });
+                            }
+                        });
+                    }).catch(() => {
+                        resolve(404);
+                    });
+                }).catch(() => {
+                    resolve(404);
+                });
+            }
+        });
+    }
+
+    static getFriendAnimes(userId, logged, token) {
+        return new Promise((resolve, reject) => {
+            if (userId !== logged) reject(403);
+            else {
+                models.FriendList.findOne({userId: userId}, (err, friends) => {
+                    if (!friends) reject(404);
+                    else {
+                        var promises = [];
+                        var animes = [];
+                        friends.friends.forEach(friend => {
+                            promises.push(new Promise((resolve, reject) => {
+                                rp({
+                                    url: 'https://animea-gateway.herokuapp.com/animes/api/v1/user/' + userId + '/animes',
+                                    headers: {
+                                        'x-access-token': token,
+                                        'x-user-id': userId
+                                    }
+                                }).then(franimes => {
+                                    animes.concat(JSON.parse(franimes));
+                                    resolve();
+                                });
+                            }));
+                        });
+                        Promise.all(promises).then(() => {
+                            var uniqueAnimes = animes.filter(function(item, pos, self) {
+                                return self.indexOf(item) == pos;
+                            });
+                            resolve(uniqueAnimes);
+                        });
+                    }
+                });
+            }
         });
     }
 }
