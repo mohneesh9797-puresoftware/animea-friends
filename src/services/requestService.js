@@ -4,6 +4,7 @@ let models = require('../models/request.model');
 let friendModels = require('../models/friendlist.model');
 var Promise = require('bluebird');
 var rp = require('request-promise');
+const sgMail = require('@sendgrid/mail');
 
 var cachedProfiles = new Map();
 
@@ -123,16 +124,16 @@ class RequestService {
         });
     }
     
-    static createRequest(req, logged) {
+    static createRequest(req, logged, noemail) {
         return new Promise((resolve, reject) => {
             if (req.userId !== logged) resolve(403);
             else {
                 rp({
                     url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + req.userId
-                }).then(() => {
+                }).then(userData => {
                     rp({
                         url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + req.friendId
-                    }).then(() => {
+                    }).then(friendData => {
                         models.RequestM.findOne({userId: req.userId, friendId: req.friendId}, (err, res) => {
                             if (res) resolve(400);
                             else {
@@ -140,8 +141,19 @@ class RequestService {
                                     if (!friends || !friends.friends.includes(req.friendId)) {
                                         req.id = Math.round(Math.random() * 1000);
                                         models.RequestM.create(req, (err) => {
-                                            if (!err) resolve(201);
-                                            else resolve(400);
+                                            if (!err) {
+                                                if (!noemail) {
+                                                    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                                                    const msg = {
+                                                        to: JSON.parse(friendData).email,
+                                                        from: 'animea.cloud@gmail.com',
+                                                        subject: 'Animea - New friend request',
+                                                        text: 'You have a new friend request from ' + JSON.parse(userData).name + '!\nCheck it out at http://animea-frontend.herokuapp.com/request/' + req.id + '.'
+                                                    };
+                                                    sgMail.send(msg);
+                                                }
+                                                resolve(201);
+                                            } else resolve(400);
                                         });
                                     } else {
                                         resolve(400);

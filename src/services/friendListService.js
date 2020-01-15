@@ -102,7 +102,7 @@ class FriendListService {
         });
     }
 
-    static getFriendAnimes(userId, logged, token) {
+    static getFriendAnimes(userId, logged, token, minRating, limit, offset) {
         return new Promise((resolve, reject) => {
             if (userId !== logged) reject(403);
             else {
@@ -114,13 +114,13 @@ class FriendListService {
                         friends.friends.forEach(friend => {
                             promises.push(new Promise((resolve, reject) => {
                                 rp({
-                                    url: 'https://animea-gateway.herokuapp.com/animes/api/v1/user/' + userId + '/animes',
+                                    url: 'https://animea-gateway.herokuapp.com/animes/api/v1/user/' + friend + '/animes',
                                     headers: {
                                         'x-access-token': token,
                                         'x-user-id': userId
                                     }
                                 }).then(franimes => {
-                                    animes.concat(JSON.parse(franimes));
+                                    animes = animes.concat(JSON.parse(franimes));
                                     resolve();
                                 });
                             }));
@@ -129,6 +129,13 @@ class FriendListService {
                             var uniqueAnimes = animes.filter(function(item, pos, self) {
                                 return self.indexOf(item) == pos;
                             });
+                            if (minRating) {
+                                uniqueAnimes = uniqueAnimes.filter(anime => {
+                                    return parseFloat(anime.attributes.averageRating) >= parseFloat(minRating);
+                                });
+                            }
+                            if (offset) uniqueAnimes = uniqueAnimes.slice(offset);
+                            if (limit) uniqueAnimes = uniqueAnimes.slice(0, limit);
                             resolve(uniqueAnimes);
                         });
                     }
