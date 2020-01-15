@@ -48,6 +48,14 @@ describe("Friend list resource", () => {
         });
     });
 
+    describe("GET /friends/animes", () => {
+        it('Should return user 1 friends animes', () => {
+            return request(app).get(basePath + '/users/5e145acd5591df48f0316f02/friends/animes').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).then((response) => {
+                expect(response.statusCode).toBe(200);
+            });
+        });
+    });
+
     describe("Delete /friends", () => {
         it('Should return status code 204', () => {
             return request(app).delete(basePath + '/users/5e145acd5591df48f0316f02/friends').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).then((response) => {
@@ -104,7 +112,7 @@ describe("Request resource",()=>{
     }); 
 
     //test Post una request
-    describe("POST /request", ()=> {
+    describe("POST /requests", ()=> {
         const request4 = {"userId":"5e145acd5591df48f0316f02", "friendId":"5e145b3c5591df48f0316f05", "message":"Solicitud 4", "id":"4"};
         dbFindOne = jest.spyOn(rmodels.RequestM, "findOne");
         dbInsert = jest.spyOn(rmodels.RequestM, "create");
@@ -117,7 +125,7 @@ describe("Request resource",()=>{
                 callback(null);
             });
             
-            return request(app).post(basePath + '/users/5e145acd5591df48f0316f02/requests').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).send(request4).then((response) =>{
+            return request(app).post(basePath + '/users/5e145acd5591df48f0316f02/requests?noemail=true').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).send(request4).then((response) =>{
                 expect(response.statusCode).toBe(201);
             });
         });
@@ -127,12 +135,41 @@ describe("Request resource",()=>{
                 callback(true);
             });
             
-            return request(app).post(basePath + '/users/5e145acd5591df48f0316f02/requests').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).send(request4).then((response) =>{
+            return request(app).post(basePath + '/users/5e145acd5591df48f0316f02/requests?noemail=true').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).send(request4).then((response) =>{
                 expect(response.statusCode).toBe(400);
             });
         });
-    })
+    });
 
+    //test Acepta una request
+    describe("GET /requests/:id/accept", ()=> {
+        it('should accept a request if everything is fine', () =>{
+            const request1 = new rmodels.RequestM({"userId":"5e145acd5591df48f0316f02", "friendId":"5e145b225591df48f0316f03", "message":"Solicitud 1", "id":"1"});
+            dbFindOne.mockImplementation((query, callback) =>{
+                callback(null, request1);
+            });
+            
+            return request(app).get(basePath + '/users/5e145acd5591df48f0316f02/requests/1/accept').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWIyMjU1OTFkZjQ4ZjAzMTZmMDMiLCJpYXQiOjE1MTYyMzkwMjJ9.Pk1IzS7GlHsL4eOnRBfj7cgIOrJz66kyJpIBI6fkQHY'}).then((response) =>{
+                expect(response.statusCode).toBe(204);
+            });
+        });
+
+        it('should return 403 if user has no permission', () =>{
+            return request(app).get(basePath + '/users/5e145acd5591df48f0316f02/requests/1/accept').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck'}).then((response) =>{
+                expect(response.statusCode).toBe(403);
+            });
+        });
+
+        it('should return 404 if there is no request', () =>{
+            dbFindOne.mockImplementation((c,callback)=>{
+                callback(null, null);
+            });
+            
+            return request(app).get(basePath + '/users/5e145acd5591df48f0316f02/requests/1/accept').set({'x-access-token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWIyMjU1OTFkZjQ4ZjAzMTZmMDMiLCJpYXQiOjE1MTYyMzkwMjJ9.Pk1IzS7GlHsL4eOnRBfj7cgIOrJz66kyJpIBI6fkQHY'}).then((response) =>{
+                expect(response.statusCode).toBe(404);
+            });
+        });
+    })
 
     //test Delete todas las requests
     describe("DELETE /requests",() =>{
@@ -144,7 +181,7 @@ describe("Request resource",()=>{
     });
 
     //test Get una request concreta  (200 si existe 404 si no)
-    describe("GET /request/:id", () => {
+    describe("GET /requests/:id", () => {
         it('Should return the request', () =>{
             const request1 = new rmodels.RequestM({"userId":"5e145acd5591df48f0316f02", "friendId":"5e145b225591df48f0316f03", "message":"Solicitud 1", "id":"1"});
             dbFindOne.mockImplementation((query, callback) =>{

@@ -15,7 +15,7 @@ router.get(basePath + '/users/:id/requests', (req, res) => {
 
 //Create a request
 router.post(basePath + '/users/:id/requests', (req, res) => {
-    RequestService.createRequest(req.body, req.userId).then(data => {
+    RequestService.createRequest(req.body, req.userId, req.params.noemail).then(data => {
         res.sendStatus(data);
     });
 });
