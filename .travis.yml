@@ -1,23 +1,22 @@
 sudo: required
 language: node_js
 node_js:
-    - "9"
+  - "9"
 services:
-    - docker
+  - docker
+  - mongodb
 before_install:
-    - wget -qO- https://toolbelt.heroku.com/install.sh | sh
+  - wget -qO- https://toolbelt.heroku.com/install.sh | sh
 install:
-    - npm install
+  - npm install
 script:
-    - npm test
-    - docker build -t animea-friends .
+  # - npm test
+  - docker build -t animea-friends .
 deploy:
-    provider: script
-    api_key:
-        secure: "d3eb2962-88a1-4826-8247-00f0641c3598"
-    skip_cleanup: true
-    script:
-        heroku container:login
-        heroku container:push web -a $HEROKU_APP_NAME;
-        heroku container:release web -a $HEROKU_APP_NAME;
-    branch: master
+  provider: script
+  skip_cleanup: true
+  script:
+    heroku container:login;
+    heroku container:push web -a $HEROKU_APP_NAME;
+    heroku container:release web -a $HEROKU_APP_NAME;
+  branch: master
