@@ -288,7 +288,7 @@ class RequestService {
                 else{
                     if (!request) resolve(404);
                     else {
-                        if (request.userId != logged) resolve(403);
+                        if (request.userId != logged && request.friendId != logged) resolve(403);
                         else {
                             models.RequestM.deleteOne({id: reqId}, (err) => {
                                 if (err) resolve(404);
