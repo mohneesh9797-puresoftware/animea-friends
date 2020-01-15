@@ -143,7 +143,7 @@ class RequestService {
                                         models.RequestM.create(req, (err) => {
                                             if (!err) {
                                                 if (!noemail) {
-                                                    sgMail.setApiKey('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');
+                                                    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
                                                     const msg = {
                                                         to: JSON.parse(friendData).email,
                                                         from: 'animea.cloud@gmail.com',
