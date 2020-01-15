@@ -7,39 +7,32 @@ var rp = require('request-promise');
 class FriendListService {
     static getFriends(userId, logged) {
         return new Promise((resolve, reject) => {
-            if (userId !== logged) reject(403);
-            else {
-                rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                    insecure: true,
-                    rejectUnauthorized: false
-                }).then(() => {
-                    models.FriendList.findOne({userId: userId}, (err, friends) => {
-                        if (!friends) resolve([]);
-                        else {
-                            var retFriends = [];
-                            var promises = [];
-                            friends.friends.forEach(friend => {
-                                promises.push(new Promise((resolve, reject) => {
-                                    rp({
-                                        url: 'https://185.176.5.147:7400/profile/api/profile/' + friend,
-                                        insecure: true,
-                                        rejectUnauthorized: false
-                                    }).then((retFr) => {
-                                        retFriends.push(JSON.parse(retFr));
-                                        resolve();
-                                    });
-                                }));
-                            });
-                            Promise.all(promises).then(() => {
-                                resolve(retFriends);
-                            });
-                        };
-                    });
-                }).catch(() => {
-                    reject(404);
+            rp({
+                url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
+            }).then(() => {
+                models.FriendList.findOne({userId: userId}, (err, friends) => {
+                    if (!friends) resolve([]);
+                    else {
+                        var retFriends = [];
+                        var promises = [];
+                        friends.friends.forEach(friend => {
+                            promises.push(new Promise((resolve, reject) => {
+                                rp({
+                                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + friend
+                                }).then((retFr) => {
+                                    retFriends.push(JSON.parse(retFr));
+                                    resolve();
+                                });
+                            }));
+                        });
+                        Promise.all(promises).then(() => {
+                            resolve(retFriends);
+                        });
+                    };
                 });
-            }
+            }).catch(() => {
+                reject(404);
+            });
         });
     }
 
@@ -48,9 +41,7 @@ class FriendListService {
             if (userId !== logged) resolve(403);
             else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
                 }).then(() => {
                     models.FriendList.findOne({userId: userId}, (err, friends) => {
                         if (!friends) resolve(204);
@@ -78,14 +69,10 @@ class FriendListService {
             if (userId !== logged) resolve(403);
             else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
                 }).then(() => {
                     rp({
-                        url: 'https://185.176.5.147:7400/profile/api/profile/' + friendId,
-                        insecure: true,
-                        rejectUnauthorized: false
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + friendId
                     }).then(() => {
                         models.FriendList.findOne({userId: userId}, (err, friends) => {
                             if (!friends || !friends.friends.includes(friendId)) resolve(404);
@@ -110,6 +97,48 @@ class FriendListService {
                     });
                 }).catch(() => {
                     resolve(404);
+                });
+            }
+        });
+    }
+
+    static getFriendAnimes(userId, logged, token, minRating, limit, offset) {
+        return new Promise((resolve, reject) => {
+            if (userId !== logged) reject(403);
+            else {
+                models.FriendList.findOne({userId: userId}, (err, friends) => {
+                    if (!friends) reject(404);
+                    else {
+                        var promises = [];
+                        var animes = [];
+                        friends.friends.forEach(friend => {
+                            promises.push(new Promise((resolve, reject) => {
+                                rp({
+                                    url: 'https://animea-gateway.herokuapp.com/animes/api/v1/user/' + friend + '/animes',
+                                    headers: {
+                                        'x-access-token': token,
+                                        'x-user-id': userId
+                                    }
+                                }).then(franimes => {
+                                    animes = animes.concat(JSON.parse(franimes));
+                                    resolve();
+                                });
+                            }));
+                        });
+                        Promise.all(promises).then(() => {
+                            var uniqueAnimes = animes.filter(function(item, pos, self) {
+                                return self.indexOf(item) == pos;
+                            });
+                            if (minRating) {
+                                uniqueAnimes = uniqueAnimes.filter(anime => {
+                                    return parseFloat(anime.attributes.averageRating) >= parseFloat(minRating);
+                                });
+                            }
+                            if (offset) uniqueAnimes = uniqueAnimes.slice(offset);
+                            if (limit) uniqueAnimes = uniqueAnimes.slice(0, limit);
+                            resolve(uniqueAnimes);
+                        });
+                    }
                 });
             }
         });

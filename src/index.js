@@ -6,7 +6,6 @@ let friendListRoute = require('./routes/friendList');
 let requestRoute = require('./routes/request');
 let path = require('path');
 let bodyParser = require('body-parser');
-let mongoose = require('mongoose');
 let database = require('../db');
 var jwt = require('jsonwebtoken');
 
@@ -52,7 +51,7 @@ app.use((err, req, res, next) => {
     res.sendFile(path.join(__dirname, '../public/500.html'));
 });
 
-const PORT = process.env.FRIENDS_PORT || 3003;
+const PORT = process.env.PORT || 3003;
 
 app.listen(PORT, () => console.info(`Server has started on port ${PORT}`));
 

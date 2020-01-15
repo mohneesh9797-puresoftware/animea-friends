@@ -4,6 +4,9 @@ let models = require('../models/request.model');
 let friendModels = require('../models/friendlist.model');
 var Promise = require('bluebird');
 var rp = require('request-promise');
+const sgMail = require('@sendgrid/mail');
+
+var cachedProfiles = new Map();
 
 class RequestService {
     static getRequests(userId, received, logged) {
@@ -11,9 +14,7 @@ class RequestService {
             if (userId !== logged && !received) reject(403);
             else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
                 }).then((user) => {
                     if(!received){
                         models.RequestM.find({userId: userId}, (err, requests) => {
@@ -63,16 +64,38 @@ class RequestService {
 
     static getRequestData(request) {
         return new Promise((resolve, reject) => {
-            rp({
-                url: 'https://185.176.5.147:7400/profile/api/profile/' + request.userId,
-                insecure: true,
-                rejectUnauthorized: false
-            }).then((user) => {
+            if (cachedProfiles.has(request.userId)) {
+                console.log('Retrieving user from cache');
+                var user = cachedProfiles.get(request.userId);
+                if (cachedProfiles.has(request.friendId)) {
+                    console.log('Retrieving friend from cache');
+                    var friend = cachedProfiles.get(request.friendId);
+                    resolve({
+                        id: request.id,
+                        user: JSON.parse(user),
+                        friend: JSON.parse(friend),
+                        message: request.message
+                    });
+                } else {
+                    rp({
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + request.friendId
+                    }).then((friend) => {
+                        cachedProfiles.set(request.friendId, friend);
+                        resolve({
+                            id: request.id,
+                            user: JSON.parse(user),
+                            friend: JSON.parse(friend),
+                            message: request.message
+                        });
+                    });
+                }
+            } else if (cachedProfiles.has(request.friendId)) {
+                console.log('Retrieving friend from cache');
+                var friend = cachedProfiles.get(request.friendId);
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + request.friendId,
-                    insecure: true,
-                    rejectUnauthorized: false
-                }).then((friend) => {
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + request.userId
+                }).then((user) => {
+                    cachedProfiles.set(request.userId, user);
                     resolve({
                         id: request.id,
                         user: JSON.parse(user),
@@ -80,24 +103,37 @@ class RequestService {
                         message: request.message
                     });
                 });
-            });
+            } else {
+                rp({
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + request.userId
+                }).then((user) => {
+                    cachedProfiles.set(request.userId, user);
+                    rp({
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + request.friendId
+                    }).then((friend) => {
+                        cachedProfiles.set(request.friendId, friend);
+                        resolve({
+                            id: request.id,
+                            user: JSON.parse(user),
+                            friend: JSON.parse(friend),
+                            message: request.message
+                        });
+                    });
+                });
+            }
         });
     }
     
-    static createRequest(req, logged) {
+    static createRequest(req, logged, noemail) {
         return new Promise((resolve, reject) => {
             if (req.userId !== logged) resolve(403);
             else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + req.userId,
-                    insecure: true,
-                    rejectUnauthorized: false
-                }).then(() => {
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + req.userId
+                }).then(userData => {
                     rp({
-                        url: 'https://185.176.5.147:7400/profile/api/profile/' + req.friendId,
-                        insecure: true,
-                        rejectUnauthorized: false
-                    }).then(() => {
+                        url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + req.friendId
+                    }).then(friendData => {
                         models.RequestM.findOne({userId: req.userId, friendId: req.friendId}, (err, res) => {
                             if (res) resolve(400);
                             else {
@@ -105,8 +141,19 @@ class RequestService {
                                     if (!friends || !friends.friends.includes(req.friendId)) {
                                         req.id = Math.round(Math.random() * 1000);
                                         models.RequestM.create(req, (err) => {
-                                            if (!err) resolve(201);
-                                            else resolve(400);
+                                            if (!err) {
+                                                if (!noemail) {
+                                                    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+                                                    const msg = {
+                                                        to: JSON.parse(friendData).email,
+                                                        from: 'animea.cloud@gmail.com',
+                                                        subject: 'Animea - New friend request',
+                                                        text: 'You have a new friend request from ' + JSON.parse(userData).name + '!\nCheck it out at http://animea-frontend.herokuapp.com/request/' + req.id + '.'
+                                                    };
+                                                    sgMail.send(msg);
+                                                }
+                                                resolve(201);
+                                            } else resolve(400);
                                         });
                                     } else {
                                         resolve(400);
@@ -181,9 +228,7 @@ class RequestService {
             if (userId !== logged) reject(403);
             else {
                 rp({
-                    url: 'https://185.176.5.147:7400/profile/api/profile/' + userId,
-                    insecure: true,
-                    rejectUnauthorized: false
+                    url: 'https://animea-gateway.herokuapp.com/profile/api/v1/profile/' + userId
                 }).then(() => {
                     models.RequestM.deleteMany({userId: userId},(err)=>{
                         if(err) resolve(404)
@@ -225,7 +270,7 @@ class RequestService {
                         if (request.userId != logged) resolve(403);
                         else {
                             models.RequestM.updateOne({id: reqId}, req, (err) => {
-                                if (err) resolve(404);
+                                if (err) resolve(400);
                                 else resolve(204);
                             });
                         }

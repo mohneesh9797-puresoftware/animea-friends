@@ -24,4 +24,12 @@ router.delete(basePath + '/users/:id/friends/:friendId', (req, res) => {
     });
 });
 
+router.get(basePath + '/users/:id/friends/animes', (req, res) => {
+    FriendListService.getFriendAnimes(req.params.id, req.userId, req.headers['x-access-token'], req.query.minRating, req.query.limit, req.query.offset).then(data => {
+        res.send(data);
+    }).catch(err => {
+        res.sendStatus(err);
+    });
+});
+
 module.exports = router;
