@@ -148,7 +148,7 @@ class RequestService {
                                                         to: JSON.parse(friendData).email,
                                                         from: 'animea.cloud@gmail.com',
                                                         subject: 'Animea - New friend request',
-                                                        text: 'You have a new friend request from ' + JSON.parse(userData).name + '!\nCheck it out at http://animea-frontend.herokuapp.com/request/' + req.id + '.'
+                                                        text: 'You have a new friend request from ' + JSON.parse(userData).name + '!\nCheck it out at https://animea-frontend.herokuapp.com/requests/' + req.id + '.'
                                                     };
                                                     sgMail.send(msg);
                                                 }
