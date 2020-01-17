@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/JuanmiBF/express-test#readme",
   "dependencies": {
+    "@pact-foundation/pact": "^9.6.0",
     "@sendgrid/mail": "^6.4.0",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",

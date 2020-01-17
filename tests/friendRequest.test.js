@@ -249,14 +249,4 @@ describe("Request resource",()=>{
             });
         });
     });
-
-    /*
-    //Cerrar conexión bd
-    afterAll((done) => {
-        mongoose.connection.db.dropDatabase(() => {
-            mongoose.connection.close(done);
-        });
-    }); */
-}); 
-
-
+});
