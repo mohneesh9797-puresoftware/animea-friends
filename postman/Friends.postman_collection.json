@@ -1,0 +1,347 @@
+{
+	"info": {
+		"_postman_id": "07b616ed-4419-4a12-bd04-81f39d1887d1",
+		"name": "Friends",
+		"description": "This api calls the micro-service which manages user's friends. ",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GET /friends",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}{{port}}/api/v1/users/5e145acd5591df48f0316f02/friends",
+					"host": [
+						"{{host}}{{port}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"5e145acd5591df48f0316f02",
+						"friends"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /friends/animes",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-access-token",
+						"type": "text",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck"
+					}
+				],
+				"url": {
+					"raw": "{{host}}{{port}}/api/v1/users/5e145acd5591df48f0316f02/friends/animes",
+					"host": [
+						"{{host}}{{port}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"5e145acd5591df48f0316f02",
+						"friends",
+						"animes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /friends/id",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}{{port}}/api/v1/users/5e145acd5591df48f0316f02/friends/5e145b225591df48f0316f03",
+					"host": [
+						"{{host}}{{port}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"5e145acd5591df48f0316f02",
+						"friends",
+						"5e145b225591df48f0316f03"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /friends",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-access-token",
+						"type": "text",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck"
+					}
+				],
+				"url": {
+					"raw": "{{host}}{{port}}/api/v1/users/5e145acd5591df48f0316f02/friends",
+					"host": [
+						"{{host}}{{port}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"5e145acd5591df48f0316f02",
+						"friends"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /requests",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}{{port}}/api/v1/users/5e145acd5591df48f0316f02/requests",
+					"host": [
+						"{{host}}{{port}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"5e145acd5591df48f0316f02",
+						"requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /requests/id/accept",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-access-token",
+						"type": "text",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWIyMjU1OTFkZjQ4ZjAzMTZmMDMiLCJpYXQiOjE1MTYyMzkwMjJ9.Pk1IzS7GlHsL4eOnRBfj7cgIOrJz66kyJpIBI6fkQHY"
+					}
+				],
+				"url": {
+					"raw": "{{host}}{{port}}/api/v1/users/5e145acd5591df48f0316f02/requests/1/accept",
+					"host": [
+						"{{host}}{{port}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"5e145acd5591df48f0316f02",
+						"requests",
+						"1",
+						"accept"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "POST  /requests",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"userId\": \"5e145acd5591df48f0316f02\",\n\t\"friendId\": \"5e145b225591df48f0316f03\",\n\t\"message\": \"Hello\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3003/api/v1/users/5e145acd5591df48f0316f02/requests",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3003",
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"5e145acd5591df48f0316f02",
+						"requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /requests",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}{{port}}/api/v1/users/5e145acd5591df48f0316f02/requests",
+					"host": [
+						"{{host}}{{port}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"5e145acd5591df48f0316f02",
+						"requests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GET /requests/id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}{{port}}/api/v1/users/5e145acd5591df48f0316f02/requests/1",
+					"host": [
+						"{{host}}{{port}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"5e145acd5591df48f0316f02",
+						"requests",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PUT /requests/id",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"userId\": \"5e145acd5591df48f0316f02\",\n\t\"friendId\": \"5e145b225591df48f0316f03\",\n\t\"message\": \"Hola\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{host}}{{port}}/api/v1/users/5e145acd5591df48f0316f02/requests/1",
+					"host": [
+						"{{host}}{{port}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"5e145acd5591df48f0316f02",
+						"requests",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "DELETE /requests/id",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-access-token",
+						"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaWQiOiI1ZTE0NWFjZDU1OTFkZjQ4ZjAzMTZmMDIiLCJpYXQiOjE1MTYyMzkwMjJ9.RZ_kqF4AV8Ir3OToNiV9X8qr4zFL6ZJmoG6QNH4-gck",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{host}}{{port}}/api/v1/users/5e145acd5591df48f0316f02/requests/1",
+					"host": [
+						"{{host}}{{port}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"users",
+						"5e145acd5591df48f0316f02",
+						"requests",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
