@@ -35,7 +35,7 @@ describe("Cat's API", () => {
                 uponReceiving: "a request for animes followed by friends",
                 withRequest: {
                     method: "GET",
-                    path: "/animes/api/v1/user/5e145acd5591df48f0316f02/animes"
+                    path: "/api/v1/user/5e145acd5591df48f0316f02/animes"
                 },
                 willRespondWith: {
                     status: 200,

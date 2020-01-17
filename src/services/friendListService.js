@@ -106,7 +106,7 @@ class FriendListService {
         return new Promise((resolve, reject) => {
             if (userId !== logged) reject(403);
             else {
-                var baseUrl = isPact ? 'http://localhost:30303' : 'https://animea-gateway.herokuapp.com';
+                var baseUrl = isPact ? 'http://localhost:30303' : 'https://animea-gateway.herokuapp.com/animes';
                 models.FriendList.findOne({userId: userId}, (err, friends) => {
                     if (!friends) reject(404);
                     else {
@@ -115,7 +115,7 @@ class FriendListService {
                         friends.friends.forEach(friend => {
                             promises.push(new Promise((resolve, reject) => {
                                 rp({
-                                    url: baseUrl + '/animes/api/v1/user/' + friend + '/animes',
+                                    url: baseUrl + '/api/v1/user/' + friend + '/animes',
                                     headers: {
                                         'x-access-token': token,
                                         'x-user-id': userId

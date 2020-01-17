@@ -11,7 +11,7 @@
       "providerState": "I have a list of friends",
       "request": {
         "method": "GET",
-        "path": "/animes/api/v1/user/5e145acd5591df48f0316f02/animes"
+        "path": "/api/v1/user/5e145acd5591df48f0316f02/animes"
       },
       "response": {
         "status": 200,
